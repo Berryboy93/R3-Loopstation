@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface StatusBarProps {
   bpm: number;
 }
@@ -7,6 +9,7 @@ const Pipe = () => (
 );
 
 export function StatusBar({ bpm }: StatusBarProps) {
+  const [midiActive, setMidiActive] = useState(false);
   return (
     <div
       className="h-[26px] flex items-center justify-between px-3 shrink-0 select-none"
@@ -34,15 +37,16 @@ export function StatusBar({ bpm }: StatusBarProps) {
         <span style={{ color: '#3a3a3a', letterSpacing: '0.06em' }}>EXT: DLY</span>
         <Pipe />
         <button
+          onClick={() => setMidiActive(m => !m)}
           style={{
-            border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2,
-            padding: '1px 7px', color: '#555', background: 'transparent',
-            fontFamily: 'inherit', fontSize: 'inherit', cursor: 'pointer',
-            letterSpacing: '0.06em',
-            transition: 'color 0.12s',
+            border: `1px solid ${midiActive ? 'rgba(183,255,0,0.45)' : 'rgba(255,255,255,0.1)'}`,
+            borderRadius: 2, padding: '1px 7px', fontFamily: 'inherit', fontSize: 'inherit',
+            cursor: 'pointer', letterSpacing: '0.06em', transition: 'all 0.12s',
+            color: midiActive ? '#B7FF00' : '#555',
+            background: midiActive ? 'rgba(183,255,0,0.08)' : 'transparent',
+            boxShadow: midiActive ? '0 0 6px rgba(183,255,0,0.3)' : 'none',
+            textShadow: midiActive ? '0 0 6px rgba(183,255,0,0.5)' : 'none',
           }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#888'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#555'; }}
         >MIDI IN</button>
         <Pipe />
         <div className="flex items-center gap-1.5">

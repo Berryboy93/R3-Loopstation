@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Fader } from './Fader';
 import { ParamRow } from './ParamRow';
 
@@ -10,12 +10,24 @@ interface LoopSlotProps {
 
 export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
   const [isRecording, setIsRecording] = useState(false);
-  const [muted, setMuted] = useState(false);
-  const [soloed, setSoloed] = useState(false);
-  const [quantized, setQuantized] = useState(false);
-  const [hasLoop, setHasLoop] = useState(false);
+  const [muted,       setMuted]       = useState(false);
+  const [soloed,      setSoloed]      = useState(false);
+  const [quantized,   setQuantized]   = useState(false);
+  const [hasLoop,     setHasLoop]     = useState(false);
+  const [showMenu,    setShowMenu]    = useState(false);
   // Stable random initial value — computed once on mount, not on every render
   const initialFaderValue = useRef(0.7 + Math.random() * 0.1);
+  const menuBtnRef = useRef<HTMLDivElement>(null);
+
+  // Dismiss slot menu when clicking outside
+  useEffect(() => {
+    if (!showMenu) return;
+    const close = (e: MouseEvent) => {
+      if (menuBtnRef.current && !menuBtnRef.current.contains(e.target as Node)) setShowMenu(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [showMenu]);
 
   return (
     <div
@@ -38,10 +50,49 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
             <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
           </svg>
         </div>
-        <button style={{ color: 'rgba(140,150,170,0.35)', fontFamily: "'Share Tech Mono', monospace", fontSize: 10, background: 'transparent', border: 'none', cursor: 'pointer', transition: 'color 0.12s' }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(200,210,230,0.7)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(140,150,170,0.35)'; }}
-        >···</button>
+        <div ref={menuBtnRef} style={{ position: 'relative' }}>
+          <button
+            onClick={() => setShowMenu(m => !m)}
+            style={{ color: showMenu ? 'rgba(200,210,230,0.7)' : 'rgba(140,150,170,0.35)', fontFamily: "'Share Tech Mono', monospace", fontSize: 10, background: 'transparent', border: 'none', cursor: 'pointer', transition: 'color 0.12s', padding: '0 2px' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(200,210,230,0.7)'; }}
+            onMouseLeave={e => { if (!showMenu) (e.currentTarget as HTMLButtonElement).style.color = 'rgba(140,150,170,0.35)'; }}
+          >···</button>
+          {showMenu && (
+            <div style={{
+              position: 'absolute', top: '100%', right: 0, zIndex: 60, marginTop: 3,
+              background: '#161616', border: '1px solid #2e2e2e', borderRadius: 3,
+              boxShadow: `0 6px 20px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.04)`,
+              minWidth: 116, overflow: 'hidden',
+            }}>
+              {([
+                { label: 'RENAME',    icon: '✎', col: '#aaa'     },
+                { label: 'DUPLICATE', icon: '⧉', col: '#aaa'     },
+                { label: 'EXPORT',    icon: '↑', col: '#aaa'     },
+                { label: 'CLEAR',     icon: '✕', col: '#FF4444'  },
+              ] as const).map(item => (
+                <button
+                  key={item.label}
+                  onClick={() => {
+                    if (item.label === 'CLEAR') { setIsRecording(false); setHasLoop(false); }
+                    setShowMenu(false);
+                  }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 8,
+                    width: '100%', padding: '7px 12px', border: 'none',
+                    background: 'transparent', cursor: 'pointer', textAlign: 'left',
+                    fontFamily: "'Share Tech Mono', monospace", fontSize: 9,
+                    letterSpacing: '0.1em', color: item.col,
+                    borderBottom: '1px solid #1e1e1e', transition: 'background 0.08s',
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.05)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                >
+                  <span style={{ opacity: 0.55, fontSize: 10 }}>{item.icon}</span>{item.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Record zone */}

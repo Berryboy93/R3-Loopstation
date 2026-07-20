@@ -55,6 +55,19 @@ export function MixerView() {
   const [masterMuted,   setMasterMuted]   = useState(false);
   const [masterSoloed,  setMasterSoloed]  = useState(false);
 
+  // Per-channel EQ / AUX / PAN — each knob writes here, nothing is dead
+  type ChParams = { hi: number; mid: number; lo: number; a1: number; a2: number; pan: number };
+  const [channelParams, setChannelParams] = useState<ChParams[]>(() =>
+    Array.from({ length: 8 }, () => ({ hi: 0.5, mid: 0.5, lo: 0.5, a1: 0, a2: 0, pan: 0.5 }))
+  );
+  const setChParam = (i: number, key: keyof ChParams, v: number) =>
+    setChannelParams(prev => prev.map((ch, ci) => ci === i ? { ...ch, [key]: v } : ch));
+
+  // Master section params
+  const [masterGain,  setMasterGain]  = useState(0.8);
+  const [masterWidth, setMasterWidth] = useState(0.5);
+  const [masterSend,  setMasterSend]  = useState(0.3);
+
   // Stable initial fader values — computed once, never on re-render
   const initialFaderValues = useMemo(
     () => Array.from({ length: 8 }, () => 0.72 + Math.random() * 0.08),
@@ -138,9 +151,9 @@ export function MixerView() {
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 gap: 4, width: '100%', padding: '6px 0 8px',
               }}>
-                <Knob size={26} color="#B7FF00" initialValue={0.5} label="HI"  />
-                <Knob size={26} color="#FF8C00" initialValue={0.5} label="MID" />
-                <Knob size={26} color="#00BFFF" initialValue={0.5} label="LO"  />
+                <Knob size={26} color="#B7FF00" initialValue={channelParams[i].hi}  label="HI"  onChange={v => setChParam(i, 'hi',  v)} />
+                <Knob size={26} color="#FF8C00" initialValue={channelParams[i].mid} label="MID" onChange={v => setChParam(i, 'mid', v)} />
+                <Knob size={26} color="#00BFFF" initialValue={channelParams[i].lo}  label="LO"  onChange={v => setChParam(i, 'lo',  v)} />
               </div>
 
               <SectionLine />
@@ -150,8 +163,8 @@ export function MixerView() {
                 display: 'flex', gap: 4, justifyContent: 'center',
                 width: '100%', padding: '5px 0',
               }}>
-                <Knob size={22} color="#555" initialValue={0} label="A1" />
-                <Knob size={22} color="#555" initialValue={0} label="A2" />
+                <Knob size={22} color="#555" initialValue={channelParams[i].a1} label="A1" onChange={v => setChParam(i, 'a1', v)} />
+                <Knob size={22} color="#555" initialValue={channelParams[i].a2} label="A2" onChange={v => setChParam(i, 'a2', v)} />
               </div>
 
               <SectionLine />
@@ -161,7 +174,7 @@ export function MixerView() {
                 display: 'flex', justifyContent: 'center',
                 width: '100%', padding: '5px 0',
               }}>
-                <Knob size={28} color={color} initialValue={0.5} label="PAN" />
+                <Knob size={28} color={color} initialValue={channelParams[i].pan} label="PAN" onChange={v => setChParam(i, 'pan', v)} />
               </div>
 
               <SectionLine />
@@ -224,8 +237,8 @@ export function MixerView() {
             display: 'flex', gap: 8, justifyContent: 'center',
             width: '100%', padding: '6px 0 8px',
           }}>
-            <Knob size={34} color="#B7FF00" initialValue={0.8}  label="GAIN"  />
-            <Knob size={34} color="#00BFFF" initialValue={0.5}  label="WIDTH" />
+            <Knob size={34} color="#B7FF00" initialValue={masterGain}  label="GAIN"  onChange={setMasterGain} />
+            <Knob size={34} color="#00BFFF" initialValue={masterWidth} label="WIDTH" onChange={setMasterWidth} />
           </div>
 
           <SectionLine />
@@ -235,7 +248,7 @@ export function MixerView() {
             display: 'flex', justifyContent: 'center',
             width: '100%', padding: '5px 0',
           }}>
-            <Knob size={30} color="#BF5FFF" initialValue={0.3} label="SEND" />
+            <Knob size={30} color="#BF5FFF" initialValue={masterSend} label="SEND" onChange={setMasterSend} />
           </div>
 
           <SectionLine />

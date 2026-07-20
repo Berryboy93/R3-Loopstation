@@ -4,6 +4,11 @@ import { Knob } from './Knob';
 export function MasterEQ() {
   const [lMeter, setLMeter] = useState(0);
   const [rMeter, setRMeter] = useState(0);
+  // EQ band values — wired to each knob's onChange
+  const [eqLow,  setEqLow]  = useState(0.6);
+  const [eqMid,  setEqMid]  = useState(0.5);
+  const [eqHigh, setEqHigh] = useState(0.7);
+  const [eqAir,  setEqAir]  = useState(0.35);
   const rafRef = useRef<number>(0);
   const timeRef = useRef(Math.random() * 100);
 
@@ -62,10 +67,10 @@ export function MasterEQ() {
       </div>
 
       <div style={{ display: 'flex', gap: 6, justifyContent: 'space-between' }}>
-        <Knob label="LOW"  size={30} color="#FF8C00" initialValue={0.6} />
-        <Knob label="MID"  size={30} color="#FFD700" initialValue={0.5} />
-        <Knob label="HIGH" size={30} color="#00BFFF" initialValue={0.7} />
-        <Knob label="AIR"  size={30} color="#B7FF00" initialValue={0.35} />
+        <Knob label="LOW"  size={30} color="#FF8C00" initialValue={eqLow}  onChange={setEqLow}  />
+        <Knob label="MID"  size={30} color="#FFD700" initialValue={eqMid}  onChange={setEqMid}  />
+        <Knob label="HIGH" size={30} color="#00BFFF" initialValue={eqHigh} onChange={setEqHigh} />
+        <Knob label="AIR"  size={30} color="#B7FF00" initialValue={eqAir}  onChange={setEqAir}  />
       </div>
     </div>
   );

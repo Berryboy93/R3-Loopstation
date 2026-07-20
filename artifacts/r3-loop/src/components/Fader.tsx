@@ -71,10 +71,10 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
     <div className={`flex flex-col items-center h-full w-full ${className}`} style={{ paddingTop: 8, paddingBottom: 16 }}>
       <div className="relative flex-1 w-full flex justify-center" style={{ minHeight: 180 }}>
         
-        {/* Channel strip brushed-metal bg */}
+        {/* Channel strip brushed-metal bg — single `background` property avoids
+            the shorthand-vs-longhand conflict that caused backgroundColor to be ignored */}
         <div className="absolute inset-0 rounded-sm" style={{
-          background: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px)',
-          backgroundColor: 'rgba(8,10,15,0.9)'
+          background: `rgba(8,10,15,0.9) repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px)`,
         }} />
 
         {/* Scale labels — match the linear formula: v=1→+6, v=0.8→0, v=0.6→-6 … v=0→-∞ */}

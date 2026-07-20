@@ -37,6 +37,14 @@ export function SequenceView({ bpm = 120 }: SequenceViewProps) {
   const [pattern, setPattern]         = useState<boolean[][]>(() => makeDefaultPattern(16));
   const [clipboard, setClipboard]     = useState<boolean[][] | null>(null);
   const [activePattern, setActivePattern] = useState('A');
+  // Pattern bank — each slot independently stores its own grid + step count
+  const [patternBank, setPatternBank] = useState<Record<string, { pattern: boolean[][], stepCount: number }>>(() => {
+    const init: Record<string, { pattern: boolean[][], stepCount: number }> = {};
+    ['A','B','C','D','E','F','G','H'].forEach(lbl => {
+      init[lbl] = { pattern: makeDefaultPattern(16), stepCount: 16 };
+    });
+    return init;
+  });
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const changeStepCount = useCallback((n: number) => {
@@ -291,7 +299,21 @@ export function SequenceView({ bpm = 120 }: SequenceViewProps) {
           return (
             <button
               key={p}
-              onClick={() => setActivePattern(p)}
+              onClick={() => {
+                if (p === activePattern) return;
+                // Save the live pattern into the current bank slot before leaving
+                setPatternBank(prev => ({
+                  ...prev,
+                  [activePattern]: { pattern: pattern.map(r => [...r]), stepCount },
+                }));
+                // Load the target slot
+                const next = patternBank[p];
+                setPattern(next.pattern.map(r => [...r]));
+                setStepCount(next.stepCount);
+                setCurrentStep(0);
+                setIsPlaying(false);
+                setActivePattern(p);
+              }}
               style={{
                 width: 24, height: 20, borderRadius: 2, cursor: 'pointer',
                 fontFamily: "'Share Tech Mono',monospace", fontSize: 8,

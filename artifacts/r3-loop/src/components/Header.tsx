@@ -13,6 +13,10 @@ export function Header({ bpm, setBpm }: HeaderProps) {
   const [mono, setMono]             = useState(false);
   const [meteo, setMeteo]           = useState(false);
   const [grain, setGrain]           = useState(false);
+  // Top-right action buttons — wired to local state so they react visually
+  const [isDark,    setIsDark]    = useState(true);
+  const [isSikk,    setIsSikk]    = useState(false);
+  const [isLinked,  setIsLinked]  = useState(false);
 
   // VU meter — animated via rAF, NOT Math.random() in render
   const [vuLevels, setVuLevels]     = useState<number[]>(Array(8).fill(0));
@@ -221,7 +225,15 @@ export function Header({ bpm, setBpm }: HeaderProps) {
           </div>
           <div className="flex justify-between items-center px-[2px]">
             <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, color: '#333' }}>L.M</span>
-            <button style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, color: '#B7FF00', background: 'rgba(183,255,0,0.06)', border: '1px solid rgba(183,255,0,0.2)', padding: '1px 6px', borderRadius: 2, cursor: 'pointer' }}>LINK</button>
+            <button
+              onClick={() => setIsLinked(l => !l)}
+              style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, padding: '1px 6px', borderRadius: 2, cursor: 'pointer', transition: 'all 0.12s',
+                color: isLinked ? '#080808' : '#B7FF00',
+                background: isLinked ? '#B7FF00' : 'rgba(183,255,0,0.06)',
+                border: `1px solid ${isLinked ? '#B7FF00' : 'rgba(183,255,0,0.2)'}`,
+                boxShadow: isLinked ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
+              }}
+            >LINK</button>
           </div>
         </div>
 
@@ -251,12 +263,24 @@ export function Header({ bpm, setBpm }: HeaderProps) {
       <div className="flex items-center gap-3 h-full pl-4" style={{ borderLeft: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="flex flex-col gap-[5px]">
           <div className="flex gap-1">
-            <button style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, padding: '3px 7px', background: 'rgba(255,255,255,0.04)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 2, cursor: 'pointer' }}>
-              ● DARK
-            </button>
-            <button style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, padding: '3px 7px', background: 'transparent', color: '#555', border: '1px solid rgba(255,255,255,0.06)', borderRadius: 2, cursor: 'pointer' }}>
-              ⟳ SIKK
-            </button>
+            <button
+              onClick={() => setIsDark(d => !d)}
+              style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, padding: '3px 7px', borderRadius: 2, cursor: 'pointer', transition: 'all 0.12s',
+                background: isDark ? 'rgba(255,255,255,0.1)' : 'transparent',
+                color: isDark ? '#fff' : '#555',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)'}`,
+                boxShadow: isDark ? 'inset 0 1px 0 rgba(255,255,255,0.15)' : 'none',
+              }}
+            >● DARK</button>
+            <button
+              onClick={() => setIsSikk(s => !s)}
+              style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 9, padding: '3px 7px', borderRadius: 2, cursor: 'pointer', transition: 'all 0.12s',
+                background: isSikk ? 'rgba(183,255,0,0.1)' : 'transparent',
+                color: isSikk ? '#B7FF00' : '#555',
+                border: `1px solid ${isSikk ? 'rgba(183,255,0,0.3)' : 'rgba(255,255,255,0.06)'}`,
+                textShadow: isSikk ? '0 0 8px rgba(183,255,0,0.7)' : 'none',
+              }}
+            >⟳ SIKK</button>
           </div>
           <button style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, color: '#444', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'right' }}>
             SIGN OUT

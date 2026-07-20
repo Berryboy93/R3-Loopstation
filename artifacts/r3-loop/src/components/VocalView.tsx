@@ -30,7 +30,8 @@ function generatePitchPoints(width: number, height: number, t: number): string {
 const TWO_PI_100 = Math.PI * 2 * 100; // modulo wrap-point — keeps t bounded
 
 export function VocalView() {
-  const [bypassed, setBypassed]     = useState(false);
+  const [bypassed,     setBypassed]     = useState(false);
+  const [isRecording,  setIsRecording]  = useState(false);
   const [selectedKey, setKey]       = useState('C');
   const [selectedScale, setScale]   = useState('MAJOR');
   const [selectedPreset, setPreset] = useState('NATURAL');
@@ -119,11 +120,20 @@ export function VocalView() {
               transition: 'all 0.15s',
             }}
           >{bypassed ? 'BYPASSED' : 'ACTIVE'}</button>
-          <button style={{
-            font: 'var(--type-label)', padding: '3px 10px', borderRadius: 2, cursor: 'pointer',
-            background: 'rgba(255,59,59,0.1)', color: '#FF3B3B',
-            border: '1px solid rgba(255,59,59,0.35)',
-          }}>● REC</button>
+          <button
+            onClick={() => setIsRecording(r => !r)}
+            style={{
+              font: 'var(--type-label)', padding: '3px 10px', borderRadius: 2, cursor: 'pointer',
+              background: isRecording ? 'rgba(255,59,59,0.22)' : 'rgba(255,59,59,0.1)',
+              color: '#FF3B3B',
+              border: `1px solid rgba(255,59,59,${isRecording ? '0.65' : '0.35'})`,
+              boxShadow: isRecording ? '0 0 10px rgba(255,59,59,0.45)' : 'none',
+              transition: 'all 0.12s',
+            }}
+          >
+            <span style={{ display: 'inline-block', animation: isRecording ? 'pulse-glow 1s ease-in-out infinite' : 'none' }}>●</span>
+            {' '}{isRecording ? 'RECORDING' : 'REC'}
+          </button>
         </div>
       </div>
 
