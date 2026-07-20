@@ -53,6 +53,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
     }
   }, [setBpm]);
 
+  const [hoveredNudge, setHoveredNudge] = useState<number | null>(null);
   const adjustBpm = (delta: number) =>
     setBpm(Math.max(40, Math.min(280, bpm + delta)));
 
@@ -151,18 +152,18 @@ export function Header({ bpm, setBpm }: HeaderProps) {
               <button
                 key={n}
                 onClick={() => adjustBpm(n)}
+                onMouseEnter={() => setHoveredNudge(n)}
+                onMouseLeave={() => setHoveredNudge(null)}
                 style={{
                   fontFamily: "'Share Tech Mono', monospace", fontSize: 8,
                   width: 24, height: 18,
                   background: 'rgba(255,255,255,0.03)',
-                  color: '#555',
-                  border: '1px solid rgba(255,255,255,0.07)',
+                  color: hoveredNudge === n ? '#B7FF00' : '#555',
+                  border: `1px solid ${hoveredNudge === n ? 'rgba(183,255,0,0.3)' : 'rgba(255,255,255,0.07)'}`,
                   borderRadius: 2, cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'all 0.08s',
                 }}
-                onMouseEnter={e => { (e.target as HTMLButtonElement).style.color = '#B7FF00'; (e.target as HTMLButtonElement).style.borderColor = 'rgba(183,255,0,0.3)'; }}
-                onMouseLeave={e => { (e.target as HTMLButtonElement).style.color = '#555'; (e.target as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.07)'; }}
               >{n > 0 ? `+${n}` : n}</button>
             ))}
           </div>

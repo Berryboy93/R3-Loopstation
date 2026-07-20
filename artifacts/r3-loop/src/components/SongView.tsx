@@ -13,7 +13,11 @@ const TRACKS = [
 const TOTAL_BARS = 32;
 const BAR_WIDTH = 32;
 
-export function SongView() {
+interface SongViewProps {
+  bpm?: number;
+}
+
+export function SongView({ bpm = 120 }: SongViewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playhead, setPlayhead] = useState(1);
   const [loopOn, setLoopOn] = useState(true);
@@ -25,14 +29,14 @@ export function SongView() {
 
   useEffect(() => {
     if (isPlaying) {
+      // 1 bar = 4 beats at BPM; ms per bar = 60000 / bpm * 4
+      const msPerBar = Math.round((60000 / bpm) * 4);
       const step = (ts: number) => {
         if (lastTimeRef.current === 0) lastTimeRef.current = ts;
         const elapsed = ts - lastTimeRef.current;
-        // advance 1 bar every ~500ms (≈ 120 BPM 4/4)
-        if (elapsed > 500) {
+        if (elapsed > msPerBar) {
           lastTimeRef.current = ts;
           playheadRef.current = playheadRef.current >= TOTAL_BARS ? 1 : playheadRef.current + 1;
-          // Loop back to loopStart if loop is on and playhead reaches loopEnd
           if (loopOn && playheadRef.current >= loopEnd) playheadRef.current = loopStart;
           setPlayhead(playheadRef.current);
         }
@@ -45,7 +49,7 @@ export function SongView() {
       lastTimeRef.current = 0;
     }
     return () => cancelAnimationFrame(rafRef.current);
-  }, [isPlaying, loopOn]);
+  }, [isPlaying, loopOn, bpm]);
 
   const togglePlay = () => {
     if (!isPlaying) { playheadRef.current = playhead; }

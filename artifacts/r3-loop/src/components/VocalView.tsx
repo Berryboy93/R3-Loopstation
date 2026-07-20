@@ -1,62 +1,76 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Knob } from './Knob';
 
 const KEYS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const SCALES = ['CHROMATIC','MAJOR','MINOR','DORIAN','MIXOLYDIAN','CUSTOM'];
 const PRESETS = [
-  { name: 'NATURAL',  retune: 0.35, humanize: 0.6, formant: 0.5, mix: 0.85 },
-  { name: 'ROBOT',    retune: 0.95, humanize: 0.05, formant: 0.3, mix: 1.0 },
-  { name: 'CHOIR',    retune: 0.6,  humanize: 0.7, formant: 0.65, mix: 0.75 },
-  { name: 'HARD',     retune: 0.9,  humanize: 0.1, formant: 0.5, mix: 0.95 },
-  { name: 'FOLK',     retune: 0.25, humanize: 0.8, formant: 0.55, mix: 0.6 },
-  { name: 'POP',      retune: 0.55, humanize: 0.5, formant: 0.5, mix: 0.9 },
-  { name: 'SUBTLE',   retune: 0.2,  humanize: 0.85, formant: 0.5, mix: 0.45 },
-  { name: 'CUSTOM',   retune: 0.5,  humanize: 0.5, formant: 0.5, mix: 0.7 },
+  { name: 'NATURAL',  retune: 0.35, humanize: 0.6,  formant: 0.5,  mix: 0.85 },
+  { name: 'ROBOT',    retune: 0.95, humanize: 0.05, formant: 0.3,  mix: 1.0  },
+  { name: 'CHOIR',    retune: 0.6,  humanize: 0.7,  formant: 0.65, mix: 0.75 },
+  { name: 'HARD',     retune: 0.9,  humanize: 0.1,  formant: 0.5,  mix: 0.95 },
+  { name: 'FOLK',     retune: 0.25, humanize: 0.8,  formant: 0.55, mix: 0.6  },
+  { name: 'POP',      retune: 0.55, humanize: 0.5,  formant: 0.5,  mix: 0.9  },
+  { name: 'SUBTLE',   retune: 0.2,  humanize: 0.85, formant: 0.5,  mix: 0.45 },
+  { name: 'CUSTOM',   retune: 0.5,  humanize: 0.5,  formant: 0.5,  mix: 0.7  },
 ];
 
-// Animated pitch curve data — simulate real-time pitch tracking
-function generatePitchPoints(width: number, height: number, offset: number): string {
-  const points: string[] = [];
+// Animated pitch curve — deterministic, bounded input so no float overflow
+function generatePitchPoints(width: number, height: number, t: number): string {
   const segments = 40;
-  for (let i = 0; i <= segments; i++) {
+  return Array.from({ length: segments + 1 }, (_, i) => {
     const x = (i / segments) * width;
-    const t = (i / segments) * Math.PI * 4 + offset;
-    // Quantized pitch snapping simulation — mostly on note targets with occasional drift
-    const target = Math.round(Math.sin(t * 0.4) * 4) * (height / 12); // snap to semitone rows
-    const drift = Math.sin(t * 3.2) * (height / 24) + Math.sin(t * 7.1) * (height / 48);
-    const y = height / 2 + target + drift;
-    points.push(`${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${Math.max(4, Math.min(height - 4, y)).toFixed(1)}`);
-  }
-  return points.join(' ');
+    const phase = (i / segments) * Math.PI * 4 + t;
+    const target = Math.round(Math.sin(phase * 0.4) * 4) * (height / 12);
+    const drift = Math.sin(phase * 3.2) * (height / 24) + Math.sin(phase * 7.1) * (height / 48);
+    const y = Math.max(4, Math.min(height - 4, height / 2 + target + drift));
+    return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
+  }).join(' ');
 }
 
+const TWO_PI_100 = Math.PI * 2 * 100; // modulo wrap-point — keeps t bounded
+
 export function VocalView() {
-  const [bypassed, setBypassed]   = useState(false);
-  const [selectedKey, setKey]     = useState('C');
-  const [selectedScale, setScale] = useState('MAJOR');
+  const [bypassed, setBypassed]     = useState(false);
+  const [selectedKey, setKey]       = useState('C');
+  const [selectedScale, setScale]   = useState('MAJOR');
   const [selectedPreset, setPreset] = useState('NATURAL');
-  const [retune, setRetune]       = useState(0.35);
-  const [humanize, setHumanize]   = useState(0.6);
-  const [formant, setFormant]     = useState(0.5);
-  const [mix, setMix]             = useState(0.85);
-  const [showKeyMenu, setShowKeyMenu] = useState(false);
+  const [retune, setRetune]         = useState(0.35);
+  const [humanize, setHumanize]     = useState(0.6);
+  const [formant, setFormant]       = useState(0.5);
+  const [mix, setMix]               = useState(0.85);
+  const [showKeyMenu, setShowKeyMenu]     = useState(false);
   const [showScaleMenu, setShowScaleMenu] = useState(false);
 
-  // Animated pitch graph
-  const [pitchOffset, setPitchOffset] = useState(0);
+  // Pitch graph animation — modulo-bounded to prevent unbounded float growth
+  const [pitchT, setPitchT] = useState(0);
   const rafRef = useRef<number>(0);
-  const canvasW = 420;
-  const canvasH = 180;
 
   useEffect(() => {
-    if (bypassed) return;
+    if (bypassed) { cancelAnimationFrame(rafRef.current); return; }
     const tick = () => {
-      setPitchOffset(t => t + 0.012);
+      setPitchT(t => (t + 0.012) % TWO_PI_100);
       rafRef.current = requestAnimationFrame(tick);
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
   }, [bypassed]);
+
+  // Close dropdowns when clicking outside either menu button
+  const keyBtnRef   = useRef<HTMLButtonElement>(null);
+  const scaleBtnRef = useRef<HTMLButtonElement>(null);
+  const closeMenus = useCallback((e: MouseEvent) => {
+    if (
+      keyBtnRef.current && !keyBtnRef.current.contains(e.target as Node) &&
+      scaleBtnRef.current && !scaleBtnRef.current.contains(e.target as Node)
+    ) {
+      setShowKeyMenu(false);
+      setShowScaleMenu(false);
+    }
+  }, []);
+  useEffect(() => {
+    document.addEventListener('mousedown', closeMenus);
+    return () => document.removeEventListener('mousedown', closeMenus);
+  }, [closeMenus]);
 
   const applyPreset = (preset: typeof PRESETS[0]) => {
     setPreset(preset.name);
@@ -66,29 +80,26 @@ export function VocalView() {
     setMix(preset.mix);
   };
 
-  // Semitone guide lines for pitch graph
   const semitoneRows = Array.from({ length: 13 }, (_, i) => ({
-    y: (i / 12) * canvasH,
+    y: (i / 12) * 180,
     note: KEYS[i % 12],
     isRoot: KEYS[i % 12] === selectedKey,
   }));
 
-  // Compute displayed pitch correction % from retune
-  const correctionPct = Math.round(retune * 100);
-  // Simulate current detected pitch offset
-  const detectedOffset = ((Math.sin(pitchOffset * 3) * 4.2)).toFixed(1);
-  const inputDb = (-14.2 + Math.sin(pitchOffset * 2.1) * 3.5).toFixed(1);
-
-  const pitchPath = generatePitchPoints(canvasW, canvasH, pitchOffset);
-  // Corrected output path — closer to target
-  const correctedPath = generatePitchPoints(canvasW, canvasH, pitchOffset * (1 - retune * 0.7));
+  const correctionPct  = Math.round(retune * 100);
+  const detectedOffset = (Math.sin(pitchT * 3) * 4.2).toFixed(1);
+  const inputDb        = (-14.2 + Math.sin(pitchT * 2.1) * 3.5).toFixed(1);
+  const pitchPath      = generatePitchPoints(420, 180, pitchT);
+  const correctedPath  = generatePitchPoints(420, 180, pitchT * (1 - retune * 0.7));
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#090909' }}>
-      {/* Header */}
-      <div className="panel-header" style={{ borderBottom: `1px solid rgba(183,255,0,0.2)` }}>
+    // Outer wrapper has position:relative so the bypass overlay can cover everything
+    <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#090909', position: 'relative' }}>
+
+      {/* ── Header ── */}
+      <div className="panel-header" style={{ borderBottom: 'rgba(183,255,0,0.2) 1px solid' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span className="panel-header-title" style={{ color: bypassed ? '#444' : '#fff' }}>VOCAL PRODUCTION</span>
+          <span className="panel-header-title">VOCAL PRODUCTION</span>
           {!bypassed && (
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#B7FF00', boxShadow: 'var(--glow-green-2)', animation: 'pulse-glow 2s ease-in-out infinite' }} />
@@ -116,19 +127,16 @@ export function VocalView() {
         </div>
       </div>
 
-      {/* Main area */}
-      <div className="flex-1 flex overflow-hidden" style={{ opacity: bypassed ? 0.35 : 1, transition: 'opacity 0.3s' }}>
-        
-        {/* ── Left: Pitch Graph ── */}
+      {/* ── Main area (dimmed when bypassed) ── */}
+      <div className="flex-1 flex overflow-hidden" style={{ opacity: bypassed ? 0.3 : 1, transition: 'opacity 0.3s', pointerEvents: bypassed ? 'none' : 'auto' }}>
+
+        {/* Left: Pitch Graph */}
         <div style={{ flex: '0 0 440px', display: 'flex', flexDirection: 'column', borderRight: '1px solid #1e1e1e', background: '#080808' }}>
           {/* Graph toolbar */}
           <div style={{ height: 28, display: 'flex', alignItems: 'center', gap: 8, padding: '0 12px', background: '#0d0d0d', borderBottom: '1px solid #1a1a1a', flexShrink: 0 }}>
             <span style={{ font: 'var(--type-status)', color: '#444' }}>PITCH GRAPH</span>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: 4 }}>
-              {[
-                { label: 'INPUT', color: '#00BFFF' },
-                { label: 'OUTPUT', color: '#B7FF00' },
-              ].map(l => (
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 12 }}>
+              {[{ label: 'INPUT', color: '#00BFFF' }, { label: 'OUTPUT', color: '#B7FF00' }].map(l => (
                 <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                   <div style={{ width: 16, height: 2, background: l.color, boxShadow: `0 0 4px ${l.color}` }} />
                   <span style={{ font: 'var(--type-micro)', color: '#444' }}>{l.label}</span>
@@ -152,47 +160,18 @@ export function VocalView() {
               ))}
             </div>
 
-            {/* Graph SVG */}
-            <svg
-              width="100%"
-              height="100%"
-              viewBox={`0 0 ${canvasW} ${canvasH}`}
-              preserveAspectRatio="none"
-              style={{ position: 'absolute', left: 24, right: 0, top: 0, bottom: 0, width: 'calc(100% - 24px)', height: '100%' }}
-            >
-              {/* Horizontal note guide lines */}
+            <svg width="100%" height="100%" viewBox="0 0 420 180" preserveAspectRatio="none"
+              style={{ position: 'absolute', left: 24, top: 0, width: 'calc(100% - 24px)', height: '100%' }}>
               {semitoneRows.map((row, i) => (
-                <line
-                  key={i}
-                  x1="0" y1={row.y} x2={canvasW} y2={row.y}
+                <line key={i} x1="0" y1={row.y} x2={420} y2={row.y}
                   stroke={row.isRoot ? 'rgba(183,255,0,0.12)' : 'rgba(255,255,255,0.025)'}
-                  strokeWidth={row.isRoot ? 1 : 0.5}
-                  strokeDasharray={row.isRoot ? '' : '4 8'}
-                />
+                  strokeWidth={row.isRoot ? 1 : 0.5} strokeDasharray={row.isRoot ? '' : '4 8'} />
               ))}
-
-              {/* Input pitch path (cyan — uncorrected) */}
-              <path
-                d={pitchPath}
-                fill="none"
-                stroke="#00BFFF"
-                strokeWidth={1.5}
-                opacity={0.5}
-                style={{ filter: 'drop-shadow(0 0 3px rgba(0,191,255,0.4))' }}
-              />
-
-              {/* Corrected output pitch path (green — after processing) */}
-              <path
-                d={correctedPath}
-                fill="none"
-                stroke="#B7FF00"
-                strokeWidth={2}
-                opacity={0.85}
-                style={{ filter: 'drop-shadow(0 0 4px rgba(183,255,0,0.5))' }}
-              />
-
-              {/* Playhead */}
-              <line x1={canvasW * 0.7} y1="0" x2={canvasW * 0.7} y2={canvasH}
+              <path d={pitchPath} fill="none" stroke="#00BFFF" strokeWidth={1.5} opacity={0.5}
+                style={{ filter: 'drop-shadow(0 0 3px rgba(0,191,255,0.4))' }} />
+              <path d={correctedPath} fill="none" stroke="#B7FF00" strokeWidth={2} opacity={0.85}
+                style={{ filter: 'drop-shadow(0 0 4px rgba(183,255,0,0.5))' }} />
+              <line x1={420 * 0.7} y1="0" x2={420 * 0.7} y2={180}
                 stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
             </svg>
           </div>
@@ -201,38 +180,35 @@ export function VocalView() {
           <div style={{ height: 20, background: '#0c0c0c', borderTop: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', paddingLeft: 28 }}>
             {KEYS.map((k, i) => (
               <div key={i} style={{
-                flex: 1, textAlign: 'center',
-                font: 'var(--type-micro)', fontSize: 7,
+                flex: 1, textAlign: 'center', font: 'var(--type-micro)', fontSize: 7,
                 color: k === selectedKey ? '#B7FF00' : '#2a2a2a',
-                textShadow: k === selectedKey ? 'var(--glow-green-1)' : 'none',
               }}>{k}</div>
             ))}
           </div>
         </div>
 
-        {/* ── Right: Controls ── */}
+        {/* Right: Controls */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', background: '#0a0a0a' }}>
 
-          {/* Key + Scale + Reference row */}
-          <div style={{ padding: '10px 16px 10px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+          {/* Key + Scale + Reference + live readouts */}
+          <div style={{ padding: '10px 16px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, position: 'relative' }}>
             {/* Key selector */}
             <div style={{ position: 'relative' }}>
               <div style={{ font: 'var(--type-micro)', color: '#444', marginBottom: 3 }}>KEY</div>
               <button
+                ref={keyBtnRef}
                 onClick={() => { setShowKeyMenu(v => !v); setShowScaleMenu(false); }}
                 style={{
                   font: 'var(--type-label)', padding: '4px 10px', borderRadius: 2, cursor: 'pointer',
                   background: 'rgba(183,255,0,0.06)', color: '#B7FF00',
-                  border: '1px solid rgba(183,255,0,0.3)',
-                  boxShadow: showKeyMenu ? 'var(--glow-green-1)' : 'none',
-                  minWidth: 48,
+                  border: '1px solid rgba(183,255,0,0.3)', minWidth: 48,
                 }}
               >{selectedKey} ▾</button>
               {showKeyMenu && (
                 <div style={{
-                  position: 'absolute', top: '100%', left: 0, zIndex: 20, marginTop: 2,
+                  position: 'absolute', top: '100%', left: 0, zIndex: 30, marginTop: 2,
                   background: '#111', border: '1px solid #2a2a2a', borderRadius: 2,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.6)', display: 'flex', flexWrap: 'wrap', width: 120,
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.8)', display: 'flex', flexWrap: 'wrap', width: 120,
                 }}>
                   {KEYS.map(k => (
                     <button key={k} onClick={() => { setKey(k); setShowKeyMenu(false); }} style={{
@@ -240,8 +216,7 @@ export function VocalView() {
                       font: 'var(--type-label)', cursor: 'pointer',
                       background: k === selectedKey ? 'rgba(183,255,0,0.12)' : 'transparent',
                       color: k === selectedKey ? '#B7FF00' : '#666',
-                      border: 'none', borderBottom: '1px solid #1a1a1a',
-                      transition: 'all 0.1s',
+                      border: 'none', borderBottom: '1px solid #1a1a1a', transition: 'all 0.1s',
                     }}>{k}</button>
                   ))}
                 </div>
@@ -252,19 +227,19 @@ export function VocalView() {
             <div style={{ position: 'relative' }}>
               <div style={{ font: 'var(--type-micro)', color: '#444', marginBottom: 3 }}>SCALE</div>
               <button
+                ref={scaleBtnRef}
                 onClick={() => { setShowScaleMenu(v => !v); setShowKeyMenu(false); }}
                 style={{
                   font: 'var(--type-label)', padding: '4px 10px', borderRadius: 2, cursor: 'pointer',
                   background: 'rgba(0,191,255,0.06)', color: '#00BFFF',
-                  border: '1px solid rgba(0,191,255,0.3)',
-                  minWidth: 100,
+                  border: '1px solid rgba(0,191,255,0.3)', minWidth: 100,
                 }}
               >{selectedScale} ▾</button>
               {showScaleMenu && (
                 <div style={{
-                  position: 'absolute', top: '100%', left: 0, zIndex: 20, marginTop: 2,
+                  position: 'absolute', top: '100%', left: 0, zIndex: 30, marginTop: 2,
                   background: '#111', border: '1px solid #2a2a2a', borderRadius: 2,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.8)',
                 }}>
                   {SCALES.map(s => (
                     <button key={s} onClick={() => { setScale(s); setShowScaleMenu(false); }} style={{
@@ -272,26 +247,25 @@ export function VocalView() {
                       font: 'var(--type-label)', cursor: 'pointer',
                       background: s === selectedScale ? 'rgba(0,191,255,0.1)' : 'transparent',
                       color: s === selectedScale ? '#00BFFF' : '#666',
-                      border: 'none', borderBottom: '1px solid #1a1a1a',
-                      whiteSpace: 'nowrap',
+                      border: 'none', borderBottom: '1px solid #1a1a1a', whiteSpace: 'nowrap',
                     }}>{s}</button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Reference pitch */}
+            {/* Reference */}
             <div>
               <div style={{ font: 'var(--type-micro)', color: '#444', marginBottom: 3 }}>REFERENCE</div>
               <div style={{ font: 'var(--type-label)', color: '#555', padding: '4px 10px', background: '#0d0d0d', border: '1px solid #1e1e1e', borderRadius: 2 }}>440 Hz</div>
             </div>
 
-            {/* Separator + live readouts */}
+            {/* Live readouts */}
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 16 }}>
               {[
                 { label: 'PITCH', value: `${Number(detectedOffset) > 0 ? '+' : ''}${detectedOffset} st`, color: Math.abs(Number(detectedOffset)) > 2 ? '#FF3B3B' : '#B7FF00' },
                 { label: 'INPUT', value: `${inputDb} dBFS`, color: '#555' },
-                { label: 'CORR', value: `${correctionPct}%`, color: '#00BFFF' },
+                { label: 'CORR',  value: `${correctionPct}%`, color: '#00BFFF' },
               ].map(r => (
                 <div key={r.label} style={{ textAlign: 'right' }}>
                   <div style={{ font: 'var(--type-micro)', color: '#333' }}>{r.label}</div>
@@ -301,7 +275,7 @@ export function VocalView() {
             </div>
           </div>
 
-          {/* Main knobs row */}
+          {/* Knobs row */}
           <div style={{ padding: '16px 20px', borderBottom: '1px solid #1a1a1a', display: 'flex', alignItems: 'center', gap: 24, flexShrink: 0 }}>
             <Knob label="RETUNE"   size={52} color="#B7FF00" initialValue={retune}   onChange={setRetune} />
             <Knob label="HUMANIZE" size={52} color="#00BFFF" initialValue={humanize} onChange={setHumanize} />
@@ -340,23 +314,25 @@ export function VocalView() {
                 >{p.name}</button>
               ))}
             </div>
-
-            {/* Bypass overlay message */}
-            {bypassed && (
-              <div style={{
-                position: 'absolute', inset: 0,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(0,0,0,0.6)',
-                zIndex: 10,
-              }}>
-                <div style={{ font: 'var(--type-heading)', fontSize: 14, color: '#FF3B3B', letterSpacing: '0.2em', textShadow: 'var(--glow-red-2)' }}>
-                  BYPASSED
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
+
+      {/* ── Bypass overlay — positioned relative to root div, OUTSIDE the dimmed area ── */}
+      {bypassed && (
+        <div style={{
+          position: 'absolute', inset: 0, top: 28, // skip header (28px)
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(0,0,0,0.55)',
+          zIndex: 20,
+          pointerEvents: 'none',
+        }}>
+          <div style={{
+            font: 'var(--type-heading)', fontSize: 18, color: '#FF3B3B',
+            letterSpacing: '0.3em', textShadow: 'var(--glow-red-2)',
+          }}>BYPASSED</div>
+        </div>
+      )}
     </div>
   );
 }

@@ -44,7 +44,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
       {/* Record zone */}
       <div className="px-2 py-1.5 shrink-0" style={{ borderBottom: `1px solid ${color}20` }}>
         <button
-          onClick={() => setIsRecording(!isRecording)}
+          onClick={() => { if (isRecording) setHasLoop(true); setIsRecording(r => !r); }}
           className="w-full flex flex-col items-center justify-center gap-0.5 rounded-sm transition-all"
           style={{
             height: 80,

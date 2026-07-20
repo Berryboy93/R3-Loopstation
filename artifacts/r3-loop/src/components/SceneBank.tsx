@@ -14,7 +14,7 @@ export function SceneBank() {
     <div className="glass-panel flex flex-col p-3 select-none" style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', borderTop: 'none', borderRight: 'none', borderLeft: 'none' }}>
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] font-bold text-white tracking-widest" style={{ fontFamily: "'Rajdhani', sans-serif" }}>SCENE BANK</span>
-        <span className="text-[8px] text-[#555] bg-[#0a0a0a] px-1.5 py-0.5 rounded-sm" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.8)' }}>36 SLOTS</span>
+        <span className="text-[8px] text-[#555] bg-[#0a0a0a] px-1.5 py-0.5 rounded-sm" style={{ boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.8)' }}>16 SLOTS</span>
       </div>
 
       <div className="grid grid-cols-4 gap-1 mb-2">

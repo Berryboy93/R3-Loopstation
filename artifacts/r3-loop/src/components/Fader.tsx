@@ -50,8 +50,9 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
   const onUp = () => { isDragging.current = false; document.removeEventListener('mousemove', onMove); document.removeEventListener('mouseup', onUp); };
 
   const toDb = (v: number) => {
+    // Maps 0→-∞, 1.0→+6 dB to match the +6 top label on the scale
     if (v < 0.01) return '-∞';
-    const db = (v - 0.8) * 60;
+    const db = (v - 1.0) * 30 + 6;
     return (db > 0 ? '+' : '') + db.toFixed(1);
   };
 

@@ -126,10 +126,10 @@ export function MixerView() {
           <div className="flex justify-center py-2" style={{ borderBottom: '1px solid #222', width: '100%' }}>
             <Knob size={24} color="#BF5FFF" initialValue={0.3} label="SEND" />
           </div>
-          {/* M/S for master */}
+          {/* M/S for master — real buttons, not divs */}
           <div className="flex w-full" style={{ height: 22, borderBottom: '1px solid #222', flexShrink: 0 }}>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333', borderRight: '1px solid #222' }}>M</div>
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333' }}>S</div>
+            <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333', background: 'transparent', border: 'none', borderRight: '1px solid #222', cursor: 'pointer' }}>M</button>
+            <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333', background: 'transparent', border: 'none', cursor: 'pointer' }}>S</button>
           </div>
           <div style={{ flex: 1, width: '100%', minHeight: 120 }}>
             <Fader color="#B7FF00" initialValue={0.85} />

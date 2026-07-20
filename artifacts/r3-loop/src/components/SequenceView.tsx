@@ -22,7 +22,11 @@ function makeDefaultPattern(steps: number): boolean[][] {
   );
 }
 
-export function SequenceView() {
+interface SequenceViewProps {
+  bpm?: number;
+}
+
+export function SequenceView({ bpm = 120 }: SequenceViewProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [stepCount, setStepCount] = useState(16);
@@ -45,15 +49,17 @@ export function SequenceView() {
 
   useEffect(() => {
     if (isPlaying) {
+      // 16th-note interval derived from global BPM: 60000ms / bpm / 4 subdivisions
+      const interval16th = Math.round(60000 / bpm / 4);
       intervalRef.current = setInterval(() => {
         setCurrentStep(s => (s + 1) % stepCount);
-      }, 125);
+      }, interval16th);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setCurrentStep(0);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isPlaying, stepCount]);
+  }, [isPlaying, stepCount, bpm]);
 
   const toggleStep = (row: number, col: number) => {
     setPattern(prev => prev.map((r, ri) =>
@@ -110,7 +116,7 @@ export function SequenceView() {
           )}
         </div>
 
-        <span className="panel-header-meta">1/16 · 120 BPM</span>
+        <span className="panel-header-meta">1/16 · {bpm} BPM</span>
       </div>
 
       {/* Step grid */}

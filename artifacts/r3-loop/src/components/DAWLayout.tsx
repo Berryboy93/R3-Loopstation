@@ -22,9 +22,9 @@ export function DAWLayout() {
   const centerContent = () => {
     switch (activeTab) {
       case 'MIXER':    return <MixerView />;
-      case 'SEQUENCE': return <SequenceView />;
+      case 'SEQUENCE': return <SequenceView bpm={bpm} />;
       case 'FX RACK':  return <FxRackView />;
-      case 'SONG':     return <SongView />;
+      case 'SONG':     return <SongView bpm={bpm} />;
       case 'VOCAL':    return <VocalView />;
       default:         return <LoopGrid />;
     }

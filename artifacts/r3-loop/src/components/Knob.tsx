@@ -1,4 +1,4 @@
-import { useState, useRef, useId } from 'react';
+import { useState, useRef, useId, useEffect } from 'react';
 
 interface KnobProps {
   label?: string;
@@ -12,6 +12,11 @@ interface KnobProps {
 
 export function Knob({ label, valueDisplay, size = 44, color = '#B7FF00', initialValue = 0.5, onChange, className = '' }: KnobProps) {
   const [value, setValue] = useState(initialValue);
+
+  // Sync internal state when parent changes initialValue (e.g. preset application)
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
   const isDragging = useRef(false);
   const startY = useRef(0);
   const startValue = useRef(0);
