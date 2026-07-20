@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useViewActive } from '../contexts/ViewActiveContext';
 
 interface FaderProps {
   color: string;
@@ -20,8 +21,13 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
   const valueRef = useRef(value);
   useEffect(() => { valueRef.current = value; }, [value]);
 
-  // rAF loop — runs once on mount, stable forever.
+  // Pause the meter animation while the parent tab view is hidden — with all
+  // views kept mounted, ~16 hidden faders would otherwise churn at 60fps.
+  const viewActive = useViewActive();
+
+  // rAF loop — paused while the view is hidden, resumes on re-activation.
   useEffect(() => {
+    if (!viewActive) return;
     const animate = () => {
       timeRef.current += 0.05;
       const t    = timeRef.current;
@@ -36,7 +42,7 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
     };
     rafRef.current = requestAnimationFrame(animate);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, []);
+  }, [viewActive]);
 
   // ─── Mouse drag + unmount cleanup ─────────────────────────────────────────
   // Store active listeners in a ref so they can be removed if the component

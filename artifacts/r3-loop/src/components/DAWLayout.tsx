@@ -14,6 +14,7 @@ import { SceneBank } from './SceneBank';
 import { MasterEQ } from './MasterEQ';
 import { OutputPanel } from './OutputPanel';
 import { StatusBar } from './StatusBar';
+import { ViewActiveContext } from '../contexts/ViewActiveContext';
 
 export function DAWLayout() {
   const [activeTab, setActiveTab] = useState('PERFORM');
@@ -26,16 +27,18 @@ export function DAWLayout() {
   // any other path would hit the SPA fallback and report a false "online".
   const apiOnline = useHealthCheck('/api/healthz');
 
-  const centerContent = () => {
-    switch (activeTab) {
-      case 'MIXER':    return <MixerView />;
-      case 'SEQUENCE': return <SequenceView bpm={bpm} />;
-      case 'FX RACK':  return <FxRackView />;
-      case 'SONG':     return <SongView bpm={bpm} />;
-      case 'VOCAL':    return <VocalView />;
-      default:         return <LoopGrid onLoopCountChange={setLoopsLoaded} />;
-    }
-  };
+  // All views stay mounted; the inactive ones are hidden with display:none.
+  // This preserves per-view state (mutes, solos, knob/fader positions,
+  // patterns) across tab switches. Each view's continuous animations pause
+  // while hidden via ViewActiveContext, so hidden views cost ~nothing.
+  const views: Array<{ tab: string; node: React.ReactNode }> = [
+    { tab: 'PERFORM',  node: <LoopGrid onLoopCountChange={setLoopsLoaded} /> },
+    { tab: 'MIXER',    node: <MixerView /> },
+    { tab: 'SEQUENCE', node: <SequenceView bpm={bpm} /> },
+    { tab: 'FX RACK',  node: <FxRackView /> },
+    { tab: 'SONG',     node: <SongView bpm={bpm} /> },
+    { tab: 'VOCAL',    node: <VocalView /> },
+  ];
 
   return (
     <div className="w-full h-full flex flex-col text-white overflow-hidden" style={{ background: '#080808' }}>
@@ -46,7 +49,16 @@ export function DAWLayout() {
       <div className="flex-1 flex overflow-hidden min-h-0">
         <GlobalFX />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ background: '#0a0a0a' }}>
-          {centerContent()}
+          {views.map(({ tab, node }) => {
+            const active = tab === activeTab || (tab === 'PERFORM' && !views.some(v => v.tab === activeTab));
+            return (
+              <div key={tab} className="flex-1 flex-col min-h-0 overflow-hidden" style={{ display: active ? 'flex' : 'none' }}>
+                <ViewActiveContext.Provider value={active}>
+                  {node}
+                </ViewActiveContext.Provider>
+              </div>
+            );
+          })}
         </div>
         <div className="w-[200px] flex flex-col shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: '#0f0f0f', borderLeft: '1px solid #1e1e1e' }}>
           <SceneBank />

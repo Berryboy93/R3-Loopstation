@@ -12,9 +12,11 @@ export function useHealthCheck(url: string, intervalMs = 6000): boolean | null {
 
   useEffect(() => {
     let active = true;
+    let inflight: AbortController | null = null;
 
     const check = async () => {
       const ctrl = new AbortController();
+      inflight = ctrl;
       const tid = setTimeout(() => ctrl.abort(), 3000); // 3 s timeout per check
       try {
         const res = await fetch(url, { signal: ctrl.signal });
@@ -28,7 +30,11 @@ export function useHealthCheck(url: string, intervalMs = 6000): boolean | null {
 
     check();                                    // immediate first check
     const id = setInterval(check, intervalMs);  // then periodic
-    return () => { active = false; clearInterval(id); };
+    return () => {
+      active = false;
+      clearInterval(id);
+      inflight?.abort(); // don't leave a request in flight after unmount
+    };
   }, [url, intervalMs]);
 
   return online;

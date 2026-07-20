@@ -33,11 +33,15 @@ export function LoopSlot({ num, color, glowClass, onHasLoopChange }: LoopSlotPro
 
   return (
     <div
-      className={`flex-1 h-full flex flex-col min-w-[120px] ${glowClass}`}
+      className={`flex-1 h-full flex flex-col min-w-[120px] relative ${glowClass}`}
       style={{
         background: 'rgba(8, 11, 18, 0.85)',
         backdropFilter: 'blur(12px)',
         borderRight: '1px solid rgba(255,255,255,0.04)',
+        // backdrop-filter creates a stacking context per slot, so a later
+        // sibling slot would paint over this slot's open dropdown menu.
+        // Raise the whole slot while its menu is open.
+        zIndex: showMenu ? 40 : undefined,
       }}
     >
       {/* Slot header */}

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useViewActive } from '../contexts/ViewActiveContext';
 import { Knob } from './Knob';
 
 const KEYS   = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -106,12 +107,14 @@ export function VocalView() {
   const [pitchT, setPitchT] = useState(0);
   const rafRef = useRef<number>(0);
 
+  // Paused when bypassed OR when the VOCAL tab is hidden (views stay mounted).
+  const viewActive = useViewActive();
   useEffect(() => {
-    if (bypassed) { cancelAnimationFrame(rafRef.current); return; }
+    if (bypassed || !viewActive) { cancelAnimationFrame(rafRef.current); return; }
     const tick = () => { setPitchT(t => (t + 0.012) % TWO_PI_100); rafRef.current = requestAnimationFrame(tick); };
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, [bypassed]);
+  }, [bypassed, viewActive]);
 
   // ── Dropdown outside-click ────────────────────────────────────────
   const keyBtnRef   = useRef<HTMLButtonElement>(null);

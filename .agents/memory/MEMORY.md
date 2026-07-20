@@ -1,0 +1,2 @@
+- [R3/LOOP DAW UI patterns](r3-loop-ui-patterns.md) — tabs stay mounted + useViewActive() animation gating; backdrop-filter stacking-context menu trap; cleanupRef listener/timer convention.
+- [API routing & health check](api-routing.md) — api-server lives at `/api`; wrong paths hit the SPA and return 200 HTML (false-positive health checks).

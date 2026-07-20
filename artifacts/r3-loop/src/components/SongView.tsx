@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useViewActive } from '../contexts/ViewActiveContext';
 import { Mic, Music2, Piano, Guitar, Plus, ZoomIn, ZoomOut, Magnet, Square, Play, Pause, Circle } from 'lucide-react';
 
 // ── Design tokens (aligned with Aurora theme) ─────────────────────
@@ -117,8 +118,11 @@ export function SongView({ bpm = 120 }: SongViewProps) {
   const totalW  = barW * TOTAL_BARS;
 
   // ── Transport rAF loop ─────────────────────────────────────────
+  // Also paused while the SONG tab is hidden (views stay mounted); the
+  // timestamp ref resets so playback resumes without a giant dt jump.
+  const viewActive = useViewActive();
   useEffect(() => {
-    if (!playing) { lastTsRef.current = null; return; }
+    if (!playing || !viewActive) { lastTsRef.current = null; return; }
     const tick = (ts: number) => {
       if (lastTsRef.current == null) lastTsRef.current = ts;
       const dt  = (ts - lastTsRef.current) / 1000;
@@ -129,7 +133,7 @@ export function SongView({ bpm = 120 }: SongViewProps) {
     };
     rafRef.current = requestAnimationFrame(tick);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [playing, bpm]);
+  }, [playing, bpm, viewActive]);
 
   // ── Auto-scroll playhead into view ────────────────────────────
   useEffect(() => {
