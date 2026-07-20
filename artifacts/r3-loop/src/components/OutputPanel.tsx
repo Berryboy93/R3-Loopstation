@@ -49,7 +49,7 @@ export function OutputPanel() {
 
   return (
     <div className="glass-panel p-3 flex-1 flex flex-col select-none" style={{ borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderBottom: 'none' }}>
-      <span className="text-[10px] font-bold text-white tracking-widest mb-4" style={{ fontFamily: "'Rajdhani', sans-serif" }}>OUTPUT</span>
+      <span className="panel-header-title mb-3">OUTPUT</span>
       
       <div className="flex items-start justify-between flex-1">
         <div className="flex flex-col gap-4">

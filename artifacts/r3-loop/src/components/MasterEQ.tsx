@@ -48,7 +48,7 @@ export function MasterEQ() {
   return (
     <div style={{ padding: '10px 12px 8px', borderBottom: '1px solid #1a1a1a', background: '#0f0f0f' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-        <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 10, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>MASTER EQ</span>
+        <span className="panel-header-title">MASTER EQ</span>
         {/* L/R stereo meters */}
         <div style={{ display: 'flex', gap: 2, height: 40 }}>
           {renderMeter(lMeter)}

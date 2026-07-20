@@ -58,7 +58,7 @@ export function GlobalFX() {
       {/* Multi FX */}
       <div className="p-3">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] text-[#aaa] font-bold" style={{ fontFamily: "'Share Tech Mono', monospace" }}>DELAY</span>
+          <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, fontWeight: 700, color: '#555', letterSpacing: '0.12em' }}>DELAY</span>
           <Knob size={24} color="#FF8C00" initialValue={0.4} />
         </div>
         

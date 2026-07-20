@@ -122,7 +122,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
         <div className="flex flex-col items-center">
           <span style={{
             fontFamily: "'Share Tech Mono', monospace",
-            fontSize: 36, lineHeight: 1, color: '#B7FF00',
+            fontSize: 40, lineHeight: 1, color: '#B7FF00',
             textShadow: '0 0 12px rgba(183,255,0,0.6), 0 0 24px rgba(183,255,0,0.25)',
             letterSpacing: '-0.03em',
           }}>{bpm}</span>

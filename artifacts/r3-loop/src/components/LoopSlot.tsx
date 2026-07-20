@@ -29,16 +29,19 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
       {/* Slot header */}
       <div className="flex justify-between items-center px-2 shrink-0" style={{
         height: 28,
-        borderBottom: `1px solid ${color}30`,
-        background: `linear-gradient(90deg, ${color}08, transparent)`,
+        borderBottom: `1px solid ${color}25`,
+        background: `linear-gradient(90deg, ${color}10, transparent 70%)`,
       }}>
-        <div className="flex items-center gap-1.5">
-          <span className="font-bold text-xs" style={{ color, fontFamily: "'Share Tech Mono', monospace" }}>{num}</span>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" opacity="0.5">
+        <div className="flex items-center gap-2">
+          <span style={{ color, fontFamily: "'Share Tech Mono', monospace", fontSize: 13, fontWeight: 700, textShadow: `0 0 8px ${color}80` }}>{num}</span>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" opacity="0.4">
             <circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" />
           </svg>
         </div>
-        <button className="text-[11px] hover:text-white transition-colors" style={{ color: 'rgba(150,160,180,0.5)', fontFamily: "'Share Tech Mono', monospace" }}>···</button>
+        <button style={{ color: 'rgba(140,150,170,0.35)', fontFamily: "'Share Tech Mono', monospace", fontSize: 10, background: 'transparent', border: 'none', cursor: 'pointer', transition: 'color 0.12s' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(200,210,230,0.7)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = 'rgba(140,150,170,0.35)'; }}
+        >···</button>
       </div>
 
       {/* Record zone */}
@@ -54,7 +57,10 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           }}
         >
           {isRecording ? (
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(255,59,59,0.8)' }} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
+              <div className="w-3 h-3 rounded-full animate-pulse" style={{ background: '#FF3B3B', boxShadow: '0 0 10px rgba(255,59,59,0.9)' }} />
+              <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 7, color: '#FF3B3B', letterSpacing: '0.2em', opacity: 0.8 }}>RECORDING</span>
+            </div>
           ) : hasLoop ? (
             <>
               {/* Waveform bars to indicate loop is loaded */}
@@ -66,7 +72,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
               <span className="text-[8px] tracking-[0.12em]" style={{ color, fontFamily: "'Share Tech Mono', monospace", marginTop: 4 }}>LOOP LOADED</span>
             </>
           ) : (
-            <span className="text-[9px] tracking-[0.15em] font-bold" style={{ color: `${color}CC`, fontFamily: "'Share Tech Mono', monospace" }}>TAP TO RECORD</span>
+            <span style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, letterSpacing: '0.22em', fontWeight: 700, color: `${color}99` }}>TAP TO RECORD</span>
           )}
           <span className="text-[8px]" style={{ color: 'rgba(120,130,150,0.5)', fontFamily: "'Share Tech Mono', monospace", marginTop: hasLoop ? 2 : 0 }}>Slot {num}</span>
         </button>

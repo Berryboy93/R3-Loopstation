@@ -32,9 +32,9 @@ export function ParamRow({ label, valueDisplay, color = '#cccccc', initialValue 
 
   return (
     <div className="flex items-center gap-1.5 w-full select-none" style={{ paddingTop: 2, paddingBottom: 2 }}>
-      <span className="text-[9px] w-8 shrink-0 tracking-widest" style={{ color: 'rgba(150,160,180,0.6)', fontFamily: "'Share Tech Mono', monospace" }}>{label}</span>
+      <span className="text-[8px] w-8 shrink-0" style={{ color: 'rgba(155,165,185,0.75)', fontFamily: "'Share Tech Mono', monospace", letterSpacing: '0.1em' }}>{label}</span>
 
-      <div ref={trackRef} className="flex-1 h-[14px] flex items-center relative cursor-ew-resize group" onMouseDown={onDown}>
+      <div ref={trackRef} className="flex-1 h-[12px] flex items-center relative cursor-ew-resize group" onMouseDown={onDown}>
         {/* Track groove */}
         <div className="absolute inset-0 rounded-full overflow-hidden" style={{
           background: 'rgba(0,0,0,0.5)',
@@ -57,7 +57,7 @@ export function ParamRow({ label, valueDisplay, color = '#cccccc', initialValue 
         }} />
       </div>
 
-      <span className="text-[9px] w-10 text-right shrink-0 tabular-nums" style={{ color: 'rgba(200,210,230,0.8)', fontFamily: "'Share Tech Mono', monospace" }}>{displayVal}</span>
+      <span className="text-[8px] w-10 text-right shrink-0 tabular-nums" style={{ color: 'rgba(205,215,235,0.95)', fontFamily: "'Share Tech Mono', monospace" }}>{displayVal}</span>
     </div>
   );
 }

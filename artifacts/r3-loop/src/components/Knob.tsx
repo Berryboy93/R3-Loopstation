@@ -93,25 +93,25 @@ export function Knob({ label, valueDisplay, size = 44, color = '#B7FF00', initia
           {/* Knob face */}
           <circle cx={cx} cy={cy} r={outerR - 3} fill={`url(#${gradId})`} />
           {/* Track arc (dim) */}
-          <path d={arcPath(arcR, startAngle, startAngle + sweepTotal, true)} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="2.5" strokeLinecap="round" />
+          <path d={arcPath(arcR, startAngle, startAngle + sweepTotal, true)} fill="none" stroke="rgba(255,255,255,0.09)" strokeWidth="2" strokeLinecap="round" />
           {/* Value arc (colored) */}
           {value > 0.01 && (
             <path
               d={arcPath(arcR, startAngle, startAngle + value * sweepTotal, value > 0.5)}
               fill="none"
               stroke={color}
-              strokeWidth="2.5"
+              strokeWidth="3"
               strokeLinecap="round"
-              style={{ filter: `drop-shadow(0 0 3px ${color})` }}
+              style={{ filter: `drop-shadow(0 0 4px ${color})` }}
             />
           )}
           {/* Specular highlight */}
-          <path d={arcPath(outerR - 4, -200, -155)} fill="none" stroke="rgba(255,255,255,0.18)" strokeWidth="2" strokeLinecap="round" />
+          <path d={arcPath(outerR - 4, -200, -155)} fill="none" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" strokeLinecap="round" />
           {/* Indicator dot */}
-          <circle cx={indicator.x} cy={indicator.y} r={1.8} fill="white" style={{ filter: 'drop-shadow(0 0 2px white)' }} />
+          <circle cx={indicator.x} cy={indicator.y} r={2.2} fill="white" style={{ filter: 'drop-shadow(0 0 3px rgba(255,255,255,0.9))' }} />
         </svg>
       </div>
-      {label && <span className="text-[9px] tracking-widest uppercase" style={{ fontFamily: "'Share Tech Mono', monospace", color: 'rgba(180,185,200,0.7)' }}>{label}</span>}
+      {label && <span className="text-[8px] tracking-widest uppercase" style={{ fontFamily: "'Share Tech Mono', monospace", color: 'rgba(175,182,200,0.85)', letterSpacing: '0.14em' }}>{label}</span>}
       {valueDisplay && <span className="text-[9px]" style={{ color, fontFamily: "'Share Tech Mono', monospace" }}>{valueDisplay}</span>}
     </div>
   );
