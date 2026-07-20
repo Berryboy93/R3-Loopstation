@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "iTkCSVl48ClgQXjhiDKwv"
+uri = "file://R3-LOOP_PRD.md"
+type = "text"
+title = "R3/LOOP DAW — Product Requirements Document v1.0"
