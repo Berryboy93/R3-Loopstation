@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "R3/LOOP DAW"
+version = "1.0.0"
+id = "artifacts/r3-loop"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 26161
+
+[services.development]
+run = "pnpm --filter @workspace/r3-loop run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/r3-loop", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/r3-loop/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "26161"
+BASE_PATH = "/"

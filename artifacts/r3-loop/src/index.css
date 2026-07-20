@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root, .dark {
+  --background: 220 20% 4%;       /* deep navy-black */
+  --foreground: 0 0% 96%;
+  --card: 220 20% 6%;
+  --card-foreground: 0 0% 96%;
+  --card-border: 220 20% 15%;
+  --border: 220 15% 14%;
+  --input: 220 20% 9%;
+  --primary: 73 100% 50%;          /* #B7FF00 neon lime */
+  --primary-foreground: 220 20% 4%;
+  --secondary: 220 20% 8%;
+  --secondary-foreground: 0 0% 75%;
+  --muted: 220 20% 7%;
+  --muted-foreground: 220 10% 40%;
+  --accent: 220 20% 11%;
+  --accent-foreground: 0 0% 96%;
+  --destructive: 0 90% 58%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 73 100% 50%;
+  --radius: 0.2rem;
+  --popover: 220 20% 7%;
+  --popover-foreground: 0 0% 96%;
+  --popover-border: 220 20% 16%;
+  --sidebar: 220 20% 5%;
+  --sidebar-foreground: 0 0% 95%;
+  --sidebar-border: 220 15% 13%;
+  --sidebar-primary: 73 100% 50%;
+  --sidebar-primary-foreground: 220 20% 4%;
+  --sidebar-accent: 220 20% 8%;
+  --sidebar-accent-foreground: 0 0% 75%;
+  --sidebar-ring: 73 100% 50%;
+  --app-font-sans: 'Rajdhani', sans-serif;
+  --app-font-mono: 'Share Tech Mono', monospace;
+  --app-font-serif: Georgia, serif;
+  --chart-1: 110 100% 54%;
+  --chart-2: 195 100% 50%;
+  --chart-3: 33 100% 50%;
+  --chart-4: 276 100% 68%;
+  --chart-5: 0 100% 60%;
+
+  /* Laser glow colors - used for box-shadow glows */
+  --glow-green: rgba(183, 255, 0, 0.6);
+  --glow-cyan: rgba(0, 191, 255, 0.6);
+  --glow-orange: rgba(255, 140, 0, 0.6);
+  --glow-purple: rgba(191, 95, 255, 0.6);
+  --glow-red: rgba(255, 59, 59, 0.6);
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; width: 100%; overflow: hidden; margin: 0; padding: 0; }
+  body { font-family: 'Share Tech Mono', monospace; background: #060910; color: #f0f0f0; }
+}
+
+/* Glass panel — frosted dark glass over void */
+.glass-panel {
+  background: rgba(10, 14, 22, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
+
+/* Laser edge — a hard 1px border that glows */
+.laser-green  { border: 1px solid #B7FF00; box-shadow: 0 0 8px rgba(183,255,0,0.5), inset 0 0 8px rgba(183,255,0,0.04); }
+.laser-cyan   { border: 1px solid #00BFFF; box-shadow: 0 0 8px rgba(0,191,255,0.5), inset 0 0 8px rgba(0,191,255,0.04); }
+.laser-orange { border: 1px solid #FF8C00; box-shadow: 0 0 8px rgba(255,140,0,0.5), inset 0 0 8px rgba(255,140,0,0.04); }
+.laser-purple { border: 1px solid #BF5FFF; box-shadow: 0 0 8px rgba(191,95,255,0.5), inset 0 0 8px rgba(191,95,255,0.04); }
+.laser-red    { border: 1px solid #FF3B3B; box-shadow: 0 0 8px rgba(255,59,59,0.5),  inset 0 0 8px rgba(255,59,59,0.04); }
+.laser-white  { border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 6px rgba(255,255,255,0.1); }
+
+/* Section divider — thin glowing line */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(183,255,0,0.3), transparent);
+}
+
+/* LED glow on active state */
+.led-active { box-shadow: 0 0 6px 2px currentColor; }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 30s linear infinite; }
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px 2px rgba(183,255,0,0.6); }
+  50%       { opacity: 0.7; box-shadow: 0 0 12px 4px rgba(183,255,0,0.3); }
+}
+.animate-led-pulse { animation: pulse-glow 2s ease-in-out infinite; }
