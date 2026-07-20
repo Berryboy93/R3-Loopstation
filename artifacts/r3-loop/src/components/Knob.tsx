@@ -48,12 +48,23 @@ export function Knob({
     end:  ()             => void;
   } | null>(null);
 
+  // Same for mouse listeners — removed on unmount if a drag is in progress.
+  const mouseCleanupRef = useRef<{
+    move: (e: MouseEvent) => void;
+    up:   ()              => void;
+  } | null>(null);
+
   useEffect(() => {
     return () => {
       if (touchCleanupRef.current) {
         document.removeEventListener('touchmove', touchCleanupRef.current.move);
         document.removeEventListener('touchend',  touchCleanupRef.current.end);
         touchCleanupRef.current = null;
+      }
+      if (mouseCleanupRef.current) {
+        document.removeEventListener('mousemove', mouseCleanupRef.current.move);
+        document.removeEventListener('mouseup',   mouseCleanupRef.current.up);
+        mouseCleanupRef.current = null;
       }
     };
   }, []);
@@ -89,9 +100,11 @@ export function Knob({
     const onUp = () => {
       isDragging.current = false;
       setActive(false);
+      mouseCleanupRef.current = null;
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup',   onUp);
     };
+    mouseCleanupRef.current = { move: onMove, up: onUp };
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup',   onUp);
   };

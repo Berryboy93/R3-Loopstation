@@ -1,10 +1,30 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export function SceneBank() {
   const [activeScene,  setActiveScene]  = useState('A');
   // savedScenes tracks which slots have been explicitly saved by the user
   const [savedScenes,  setSavedScenes]  = useState<Set<string>>(new Set());
   const [recallFlash,  setRecallFlash]  = useState(false);
+
+  // Recall-flash timer — stored in a ref so it can be cleared on unmount
+  // (prevents setState after unmount) and cancelled on rapid re-clicks
+  // (prevents stacked timers cutting a new flash short).
+  const recallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (recallTimerRef.current !== null) clearTimeout(recallTimerRef.current);
+    };
+  }, []);
+
+  const handleRecall = () => {
+    if (!savedScenes.has(activeScene)) return;
+    setRecallFlash(true);
+    if (recallTimerRef.current !== null) clearTimeout(recallTimerRef.current);
+    recallTimerRef.current = setTimeout(() => {
+      setRecallFlash(false);
+      recallTimerRef.current = null;
+    }, 500);
+  };
   
   const scenes = [
     'A', 'B', 'C', 'D',
@@ -58,11 +78,7 @@ export function SceneBank() {
 
       <div className="flex gap-1">
         <button
-          onClick={() => {
-            if (!savedScenes.has(activeScene)) return;
-            setRecallFlash(true);
-            setTimeout(() => setRecallFlash(false), 500);
-          }}
+          onClick={handleRecall}
           className="flex-1 glass-panel text-[9px] py-1.5 rounded-sm transition-all"
           style={{
             fontFamily: "'Share Tech Mono', monospace",
