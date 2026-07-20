@@ -53,8 +53,8 @@ export function OutputPanel() {
       
       <div className="flex items-start justify-between flex-1">
         <div className="flex flex-col gap-4">
-          <Knob label="GAIN" size={48} color="#B7FF00" initialValue={0.8} />
-          <Knob label="WIDTH" size={40} color="#00BFFF" initialValue={0.5} />
+          <Knob label="GAIN" size={40} color="#B7FF00" initialValue={0.8} />
+          <Knob label="WIDTH" size={36} color="#00BFFF" initialValue={0.5} />
         </div>
 
         {/* Output Meters L/R */}

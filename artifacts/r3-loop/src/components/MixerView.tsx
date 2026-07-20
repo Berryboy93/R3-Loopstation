@@ -23,12 +23,12 @@ export function MixerView() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#0a0a0a' }}>
       {/* Header strip */}
-      <div className="h-8 flex items-center justify-between px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
-        <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>MIXER</span>
+      <div className="panel-header">
+        <span className="panel-header-title">MIXER</span>
         <div className="flex items-center gap-4">
-          <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#555' }}>8 CHANNELS + MASTER</span>
+          <span className="panel-header-meta">8 CHANNELS + MASTER</span>
           <div className="flex items-center gap-1.5">
-            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#39FF14', boxShadow: '0 0 6px #39FF1480' }} />
+            <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#39FF14', boxShadow: 'var(--glow-green-1)' }} />
             <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#39FF14' }}>STEREO OUT</span>
           </div>
         </div>
@@ -81,10 +81,12 @@ export function MixerView() {
                   onClick={() => toggleMute(i)}
                   style={{
                     flex: 1, fontSize: 9, fontFamily: "'Share Tech Mono',monospace",
-                    background: muted ? 'rgba(255,140,0,0.18)' : 'transparent',
+                    background: muted ? 'rgba(255,140,0,0.22)' : 'transparent',
                     color: muted ? '#FF8C00' : '#444',
-                    border: 'none', borderRight: '1px solid #1a1a1a',
+                    border: muted ? '1px solid rgba(255,140,0,0.5)' : 'none',
+                    borderRight: '1px solid #1a1a1a',
                     cursor: 'pointer',
+                    boxShadow: muted ? 'inset 0 0 8px rgba(255,140,0,0.15), 0 0 6px rgba(255,140,0,0.3)' : 'none',
                     textShadow: muted ? '0 0 8px #FF8C00' : 'none',
                     transition: 'all 0.15s',
                   }}
@@ -93,10 +95,11 @@ export function MixerView() {
                   onClick={() => setSoloChannel(soloChannel === i ? null : i)}
                   style={{
                     flex: 1, fontSize: 9, fontFamily: "'Share Tech Mono',monospace",
-                    background: soloed ? 'rgba(255,215,0,0.18)' : 'transparent',
+                    background: soloed ? 'rgba(255,215,0,0.22)' : 'transparent',
                     color: soloed ? '#FFD700' : '#444',
                     border: 'none',
                     cursor: 'pointer',
+                    boxShadow: soloed ? 'inset 0 0 8px rgba(255,215,0,0.15), 0 0 6px rgba(255,215,0,0.3)' : 'none',
                     textShadow: soloed ? '0 0 8px #FFD700' : 'none',
                     transition: 'all 0.15s',
                   }}

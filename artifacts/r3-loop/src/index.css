@@ -51,6 +51,57 @@
 }
 
 :root, .dark {
+  /* ── Design System Tokens ── */
+  /* Spacing scale (4px base) */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+
+  /* Panel anatomy — every panel uses these */
+  --panel-header-h: 28px;
+  --panel-radius: 2px;
+  --panel-border-color: rgba(255,255,255,0.07);
+  --panel-bg: #0f0f0f;
+  --panel-header-bg: #111111;
+  --panel-divider: 1px solid #1e1e1e;
+
+  /* Typography scale */
+  --type-heading:  700 10px/1 'Rajdhani', sans-serif;   /* section headers */
+  --type-label:    400 9px/1 'Share Tech Mono', monospace; /* knob/param labels */
+  --type-value:    400 9px/1 'Share Tech Mono', monospace; /* numeric readouts */
+  --type-status:   400 8px/1 'Share Tech Mono', monospace; /* status bar items */
+  --type-micro:    400 7px/1 'Share Tech Mono', monospace; /* meter scale labels */
+
+  /* Unified glow system — 3 levels per accent color. */
+  --glow-green-1: 0 0 4px rgba(183,255,0,0.25);
+  --glow-green-2: 0 0 8px rgba(183,255,0,0.45);
+  --glow-green-3: 0 0 14px rgba(183,255,0,0.65);
+
+  --glow-cyan-1:  0 0 4px rgba(0,191,255,0.25);
+  --glow-cyan-2:  0 0 8px rgba(0,191,255,0.45);
+  --glow-cyan-3:  0 0 14px rgba(0,191,255,0.65);
+
+  --glow-orange-1: 0 0 4px rgba(255,140,0,0.25);
+  --glow-orange-2: 0 0 8px rgba(255,140,0,0.45);
+  --glow-orange-3: 0 0 14px rgba(255,140,0,0.65);
+
+  --glow-purple-1: 0 0 4px rgba(191,95,255,0.25);
+  --glow-purple-2: 0 0 8px rgba(191,95,255,0.45);
+  --glow-purple-3: 0 0 14px rgba(191,95,255,0.65);
+
+  --glow-red-1:   0 0 4px rgba(255,59,59,0.25);
+  --glow-red-2:   0 0 8px rgba(255,59,59,0.45);
+  --glow-red-3:   0 0 14px rgba(255,59,59,0.65);
+
+  /* Semantic color roles */
+  --color-active:  #B7FF00;   /* green = active/online/default-on */
+  --color-secondary: #00BFFF; /* cyan = secondary / info */
+  --color-warn:    #FF8C00;   /* orange = warning / track identity */
+  --color-alt:     #BF5FFF;   /* purple = alternate track identity */
+  --color-danger:  #FF3B3B;   /* red = error / record / destroy */
+
   --background: 0 0% 3%;
   --foreground: 0 0% 95%;
   --card: 0 0% 7%;
@@ -116,12 +167,35 @@
 }
 
 /* Laser edge — a hard 1px border that glows */
-.laser-green  { border: 1px solid #B7FF00; box-shadow: 0 0 8px rgba(183,255,0,0.5), inset 0 0 8px rgba(183,255,0,0.04); }
-.laser-cyan   { border: 1px solid #00BFFF; box-shadow: 0 0 8px rgba(0,191,255,0.5), inset 0 0 8px rgba(0,191,255,0.04); }
-.laser-orange { border: 1px solid #FF8C00; box-shadow: 0 0 8px rgba(255,140,0,0.5), inset 0 0 8px rgba(255,140,0,0.04); }
-.laser-purple { border: 1px solid #BF5FFF; box-shadow: 0 0 8px rgba(191,95,255,0.5), inset 0 0 8px rgba(191,95,255,0.04); }
-.laser-red    { border: 1px solid #FF3B3B; box-shadow: 0 0 8px rgba(255,59,59,0.5),  inset 0 0 8px rgba(255,59,59,0.04); }
+.laser-green  { border: 1px solid #B7FF00; box-shadow: var(--glow-green-2), inset 0 0 6px rgba(183,255,0,0.03); }
+.laser-cyan   { border: 1px solid #00BFFF; box-shadow: var(--glow-cyan-2),  inset 0 0 6px rgba(0,191,255,0.03); }
+.laser-orange { border: 1px solid #FF8C00; box-shadow: var(--glow-orange-2), inset 0 0 6px rgba(255,140,0,0.03); }
+.laser-purple { border: 1px solid #BF5FFF; box-shadow: var(--glow-purple-2), inset 0 0 6px rgba(191,95,255,0.03); }
+.laser-red    { border: 1px solid #FF3B3B; box-shadow: var(--glow-red-2),    inset 0 0 6px rgba(255,59,59,0.03); }
 .laser-white  { border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 0 6px rgba(255,255,255,0.1); }
+
+/* Shared panel header */
+.panel-header {
+  height: var(--panel-header-h);        /* 28px everywhere */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: var(--panel-header-bg);   /* #111111 */
+  border-bottom: 1px solid #1e1e1e;
+  flex-shrink: 0;
+}
+.panel-header-title {
+  font: var(--type-heading);
+  color: #fff;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.panel-header-meta {
+  font: var(--type-status);
+  color: #444;
+  letter-spacing: 0.05em;
+}
 
 /* Section divider — thin glowing line */
 .section-divider {

@@ -19,9 +19,9 @@ export function FxRackView() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#090909' }}>
       {/* Header */}
-      <div className="h-8 flex items-center justify-between px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
-        <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>FX RACK</span>
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#555' }}>8 SLOTS · INSERT CHAIN</span>
+      <div className="panel-header">
+        <span className="panel-header-title">FX RACK</span>
+        <span className="panel-header-meta">8 SLOTS · INSERT CHAIN</span>
       </div>
 
       <div className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden p-3 flex flex-col gap-2">

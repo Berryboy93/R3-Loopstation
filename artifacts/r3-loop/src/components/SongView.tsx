@@ -55,32 +55,34 @@ export function SongView() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#090909' }}>
       {/* Transport strip */}
-      <div className="h-8 flex items-center gap-3 px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
-        <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>SONG</span>
+      <div className="panel-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span className="panel-header-title">SONG</span>
 
-        <button onClick={togglePlay} style={{
-          fontFamily: "'Share Tech Mono',monospace", fontSize: 9, padding: '2px 10px',
-          background: isPlaying ? '#B7FF00' : 'rgba(183,255,0,0.08)',
-          color: isPlaying ? '#000' : '#888',
-          border: `1px solid ${isPlaying ? '#B7FF00' : '#333'}`,
-          boxShadow: isPlaying ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
-          cursor: 'pointer', borderRadius: 2, transition: 'all 0.15s',
-        }}>{isPlaying ? '■ STOP' : '▶ PLAY'}</button>
+          <button onClick={togglePlay} style={{
+            fontFamily: "'Share Tech Mono',monospace", fontSize: 9, padding: '2px 10px',
+            background: isPlaying ? '#B7FF00' : 'rgba(183,255,0,0.08)',
+            color: isPlaying ? '#000' : '#888',
+            border: `1px solid ${isPlaying ? '#B7FF00' : '#333'}`,
+            boxShadow: isPlaying ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
+            cursor: 'pointer', borderRadius: 2, transition: 'all 0.15s',
+          }}>{isPlaying ? '■ STOP' : '▶ PLAY'}</button>
 
-        <button onClick={() => setLoopOn(l => !l)} style={{
-          fontFamily: "'Share Tech Mono',monospace", fontSize: 9, padding: '2px 8px',
-          background: loopOn ? 'rgba(255,140,0,0.12)' : 'transparent',
-          color: loopOn ? '#FF8C00' : '#444',
-          border: `1px solid ${loopOn ? '#FF8C00' : '#2a2a2a'}`,
-          cursor: 'pointer', borderRadius: 2, transition: 'all 0.15s',
-        }}>⟳ LOOP</button>
+          <button onClick={() => setLoopOn(l => !l)} style={{
+            fontFamily: "'Share Tech Mono',monospace", fontSize: 9, padding: '2px 8px',
+            background: loopOn ? 'rgba(255,140,0,0.12)' : 'transparent',
+            color: loopOn ? '#FF8C00' : '#444',
+            border: `1px solid ${loopOn ? '#FF8C00' : '#2a2a2a'}`,
+            cursor: 'pointer', borderRadius: 2, transition: 'all 0.15s',
+          }}>⟳ LOOP</button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginLeft: 4 }}>
-          <div style={{ width: 5, height: 5, borderRadius: '50%', background: isPlaying ? '#B7FF00' : '#333', boxShadow: isPlaying ? '0 0 6px rgba(183,255,0,0.8)' : 'none', transition: 'all 0.2s' }} />
-          <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#555' }}>BAR {playhead}/{TOTAL_BARS}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: isPlaying ? '#B7FF00' : '#333', boxShadow: isPlaying ? '0 0 6px rgba(183,255,0,0.8)' : 'none', transition: 'all 0.2s' }} />
+            <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#555' }}>BAR {playhead}/{TOTAL_BARS}</span>
+          </div>
         </div>
 
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#2a2a2a', marginLeft: 'auto' }}>120 BPM · 4/4</span>
+        <span className="panel-header-meta">120 BPM · 4/4</span>
       </div>
 
       {/* Main arrangement area */}

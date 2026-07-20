@@ -80,7 +80,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
           <button
             onClick={() => setIsPlaying(true)}
             style={{
-              width: 30, height: 28, borderRadius: 3,
+              width: 32, height: 28, borderRadius: 3,
               background: isPlaying ? '#B7FF00' : 'rgba(255,255,255,0.03)',
               color: isPlaying ? '#000' : '#666',
               border: isPlaying ? 'none' : '1px solid rgba(255,255,255,0.06)',
@@ -92,7 +92,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
           <button
             onClick={() => setIsPlaying(false)}
             style={{
-              width: 30, height: 28, borderRadius: 3,
+              width: 32, height: 28, borderRadius: 3,
               background: !isPlaying ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.03)',
               color: !isPlaying ? '#fff' : '#555',
               border: '1px solid rgba(255,255,255,0.06)',
@@ -103,7 +103,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
           <button
             onClick={() => setIsRecording(r => !r)}
             style={{
-              width: 30, height: 28, borderRadius: 3,
+              width: 32, height: 28, borderRadius: 3,
               background: isRecording ? '#FF3B3B' : 'rgba(255,255,255,0.03)',
               color: isRecording ? '#fff' : '#666',
               border: isRecording ? 'none' : '1px solid rgba(255,255,255,0.06)',
@@ -153,7 +153,7 @@ export function Header({ bpm, setBpm }: HeaderProps) {
                 onClick={() => adjustBpm(n)}
                 style={{
                   fontFamily: "'Share Tech Mono', monospace", fontSize: 8,
-                  width: 22, height: 18,
+                  width: 24, height: 18,
                   background: 'rgba(255,255,255,0.03)',
                   color: '#555',
                   border: '1px solid rgba(255,255,255,0.07)',

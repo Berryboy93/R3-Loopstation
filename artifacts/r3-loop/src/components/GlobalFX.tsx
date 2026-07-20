@@ -31,8 +31,8 @@ export function GlobalFX() {
       {/* Main Filter Section */}
       <div className="p-3">
         <div className="flex justify-between mb-4">
-          <Knob label="FILTER" size={56} color="#00BFFF" initialValue={0.3} />
-          <Knob label="RESO" size={40} color="#00E5FF" initialValue={0.6} />
+          <Knob label="FILTER" size={52} color="#00BFFF" initialValue={0.3} />
+          <Knob label="RESO" size={36} color="#00E5FF" initialValue={0.6} />
         </div>
         
         <div className="flex bg-[#0a0a0a] border border-[#222] rounded-sm overflow-hidden" style={{ boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.8)' }}>
@@ -62,15 +62,15 @@ export function GlobalFX() {
         </div>
         
         <div className="flex justify-between mb-4">
-          <Knob label="REVERB" size={32} color="#BF5FFF" initialValue={0.2} />
-          <Knob label="DRIVE" size={32} color="#FF3B3B" initialValue={0.8} />
-          <Knob label="CHORUS" size={32} color="#00BFFF" initialValue={0.0} />
+          <Knob label="REVERB" size={34} color="#BF5FFF" initialValue={0.2} />
+          <Knob label="DRIVE" size={34} color="#FF3B3B" initialValue={0.8} />
+          <Knob label="CHORUS" size={34} color="#00BFFF" initialValue={0.0} />
         </div>
 
         <div className="flex justify-between mb-2">
-          <Knob label="FLANGER" size={28} color="#FF8C00" initialValue={0.0} />
-          <Knob label="PHASER" size={28} color="#FFD700" initialValue={0.0} />
-          <Knob label="PITCH" size={28} color="#B7FF00" initialValue={0.5} />
+          <Knob label="FLANGER" size={30} color="#FF8C00" initialValue={0.0} />
+          <Knob label="PHASER" size={30} color="#FFD700" initialValue={0.0} />
+          <Knob label="PITCH" size={30} color="#B7FF00" initialValue={0.5} />
         </div>
       </div>
       <div className="section-divider" />
@@ -78,9 +78,9 @@ export function GlobalFX() {
       {/* LFO Section */}
       <div className="p-3" style={{ background: 'rgba(0,0,0,0.3)' }}>
         <div className="flex justify-between">
-          <Knob label="RATE" valueDisplay="5D" size={36} color="#B7FF00" initialValue={0.7} />
-          <Knob label="TIME" valueDisplay="1/4" size={36} color="#B7FF00" initialValue={0.25} />
-          <Knob label="SHAKE" valueDisplay="5D" size={36} color="#B7FF00" initialValue={0.1} />
+          <Knob label="RATE" valueDisplay="5D" size={34} color="#B7FF00" initialValue={0.7} />
+          <Knob label="TIME" valueDisplay="1/4" size={34} color="#B7FF00" initialValue={0.25} />
+          <Knob label="SHAKE" valueDisplay="5D" size={34} color="#B7FF00" initialValue={0.1} />
         </div>
       </div>
       <div className="section-divider" />
@@ -89,9 +89,9 @@ export function GlobalFX() {
       <div className="p-3">
         <div className="text-[9px] text-[#888] font-bold mb-2" style={{ fontFamily: "'Share Tech Mono', monospace" }}>DELAY</div>
         <div className="flex justify-between">
-          <Knob label="T.DLY" size={28} color="#FF8C00" initialValue={0.3} />
-          <Knob label="MIX" size={28} color="#FF8C00" initialValue={0.5} />
-          <Knob label="FEED" size={28} color="#FF8C00" initialValue={0.6} />
+          <Knob label="T.DLY" size={30} color="#FF8C00" initialValue={0.3} />
+          <Knob label="MIX" size={30} color="#FF8C00" initialValue={0.5} />
+          <Knob label="FEED" size={30} color="#FF8C00" initialValue={0.6} />
         </div>
       </div>
       <div className="section-divider" />

@@ -4,7 +4,7 @@ interface TabNavProps {
 }
 
 export function TabNav({ activeTab, setActiveTab }: TabNavProps) {
-  const tabs = ['PERFORM', 'MIXER', 'SEQUENCE', 'FX RACK', 'SONG'];
+  const tabs = ['PERFORM', 'MIXER', 'SEQUENCE', 'FX RACK', 'SONG', 'VOCAL'];
 
   return (
     <div className="h-[36px] glass-panel border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between px-2 shrink-0 select-none" style={{ borderTop: 'none', borderLeft: 'none', borderRight: 'none', borderRadius: 0 }}>

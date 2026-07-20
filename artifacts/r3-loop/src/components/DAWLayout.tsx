@@ -8,6 +8,7 @@ import { MixerView } from './MixerView';
 import { SequenceView } from './SequenceView';
 import { FxRackView } from './FxRackView';
 import { SongView } from './SongView';
+import { VocalView } from './VocalView';
 import { SceneBank } from './SceneBank';
 import { MasterEQ } from './MasterEQ';
 import { OutputPanel } from './OutputPanel';
@@ -24,6 +25,7 @@ export function DAWLayout() {
       case 'SEQUENCE': return <SequenceView />;
       case 'FX RACK':  return <FxRackView />;
       case 'SONG':     return <SongView />;
+      case 'VOCAL':    return <VocalView />;
       default:         return <LoopGrid />;
     }
   };

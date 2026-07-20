@@ -68,47 +68,49 @@ export function SequenceView() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#0a0a0a' }}>
       {/* Header */}
-      <div className="h-8 flex items-center gap-3 px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
-        <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>SEQUENCE</span>
+      <div className="panel-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span className="panel-header-title">SEQUENCE</span>
 
-        <button
-          onClick={() => setIsPlaying(p => !p)}
-          style={{
-            fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
-            padding: '2px 10px',
-            background: isPlaying ? '#B7FF00' : 'rgba(183,255,0,0.08)',
-            color: isPlaying ? '#000' : '#888',
-            border: `1px solid ${isPlaying ? '#B7FF00' : '#333'}`,
-            boxShadow: isPlaying ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
-            cursor: 'pointer', borderRadius: 2,
-            transition: 'all 0.15s',
-          }}
-        >{isPlaying ? '■ STOP' : '▶ PLAY'}</button>
-
-        {/* Step count selector */}
-        <div className="flex items-center gap-1 ml-1">
-          <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#444', marginRight: 2 }}>STEPS</span>
-          {[16, 32].map(n => (
-            <button key={n} onClick={() => changeStepCount(n)} style={{
+          <button
+            onClick={() => setIsPlaying(p => !p)}
+            style={{
               fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
-              padding: '2px 6px',
-              background: stepCount === n ? 'rgba(183,255,0,0.12)' : 'transparent',
-              color: stepCount === n ? '#B7FF00' : '#444',
-              border: `1px solid ${stepCount === n ? 'rgba(183,255,0,0.4)' : '#222'}`,
-              cursor: 'pointer', borderRadius: 2, transition: 'all 0.1s',
-            }}>{n}</button>
-          ))}
+              padding: '2px 10px',
+              background: isPlaying ? '#B7FF00' : 'rgba(183,255,0,0.08)',
+              color: isPlaying ? '#000' : '#888',
+              border: `1px solid ${isPlaying ? '#B7FF00' : '#333'}`,
+              boxShadow: isPlaying ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
+              cursor: 'pointer', borderRadius: 2,
+              transition: 'all 0.15s',
+            }}
+          >{isPlaying ? '■ STOP' : '▶ PLAY'}</button>
+
+          {/* Step count selector */}
+          <div className="flex items-center gap-1">
+            <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#444', marginRight: 2 }}>STEPS</span>
+            {[16, 32].map(n => (
+              <button key={n} onClick={() => changeStepCount(n)} style={{
+                fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
+                padding: '2px 6px',
+                background: stepCount === n ? 'rgba(183,255,0,0.12)' : 'transparent',
+                color: stepCount === n ? '#B7FF00' : '#444',
+                border: `1px solid ${stepCount === n ? 'rgba(183,255,0,0.4)' : '#222'}`,
+                cursor: 'pointer', borderRadius: 2, transition: 'all 0.1s',
+              }}>{n}</button>
+            ))}
+          </div>
+
+          {/* Playhead indicator */}
+          {isPlaying && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 4 }}>
+              <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#B7FF00', boxShadow: '0 0 6px rgba(183,255,0,0.8)', animation: 'pulse 0.5s ease-in-out infinite alternate' }} />
+              <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#B7FF00' }}>STEP {currentStep + 1}/{stepCount}</span>
+            </div>
+          )}
         </div>
 
-        {/* Playhead indicator */}
-        {isPlaying && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 4 }}>
-            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#B7FF00', boxShadow: '0 0 6px rgba(183,255,0,0.8)', animation: 'pulse 0.5s ease-in-out infinite alternate' }} />
-            <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#B7FF00' }}>STEP {currentStep + 1}/{stepCount}</span>
-          </div>
-        )}
-
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#444', marginLeft: 'auto' }}>1/16 · 120 BPM</span>
+        <span className="panel-header-meta">1/16 · 120 BPM</span>
       </div>
 
       {/* Step grid */}
