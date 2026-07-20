@@ -3,6 +3,7 @@ import { Knob } from './Knob';
 
 export function GlobalFX() {
   const [filterType, setFilterType] = useState('HPF');
+  const [reverbOpen, setReverbOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -96,13 +97,28 @@ export function GlobalFX() {
       </div>
       <div className="section-divider" />
 
-      {/* Reverb Collapsed */}
-      <div className="p-3 flex items-center justify-between hover:bg-[rgba(255,255,255,0.05)] cursor-pointer transition-colors">
+      {/* Reverb — collapsible */}
+      <button
+        onClick={() => setReverbOpen(o => !o)}
+        className="w-full p-3 flex items-center justify-between hover:bg-[rgba(255,255,255,0.05)] cursor-pointer transition-colors"
+        style={{ background: 'transparent', border: 'none', borderTop: '1px solid rgba(183,255,0,0.08)' }}
+      >
         <div className="text-[9px] text-[#888] font-bold" style={{ fontFamily: "'Share Tech Mono', monospace" }}>REVERB</div>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"
+          style={{ transform: reverbOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
           <path d="M6 9l6 6 6-6" />
         </svg>
-      </div>
+      </button>
+      {reverbOpen && (
+        <div className="px-3 pb-3">
+          <div className="flex justify-between">
+            <Knob label="SIZE"  size={28} color="#BF5FFF" initialValue={0.5} />
+            <Knob label="DAMP"  size={28} color="#BF5FFF" initialValue={0.4} />
+            <Knob label="DIFF"  size={28} color="#BF5FFF" initialValue={0.7} />
+            <Knob label="MIX"   size={28} color="#BF5FFF" initialValue={0.35} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

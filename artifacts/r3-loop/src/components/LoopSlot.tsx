@@ -48,17 +48,27 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           className="w-full flex flex-col items-center justify-center gap-0.5 rounded-sm transition-all"
           style={{
             height: 80,
-            border: isRecording ? `1px solid #FF3B3B` : `1px dashed ${color}25`,
-            background: isRecording ? 'rgba(255,59,59,0.08)' : `${color}04`,
-            boxShadow: isRecording ? '0 0 12px rgba(255,59,59,0.3), inset 0 0 20px rgba(255,59,59,0.05)' : 'none',
+            border: isRecording ? `1px solid #FF3B3B` : hasLoop ? `1px solid ${color}60` : `1px dashed ${color}25`,
+            background: isRecording ? 'rgba(255,59,59,0.08)' : hasLoop ? `${color}0A` : `${color}04`,
+            boxShadow: isRecording ? '0 0 12px rgba(255,59,59,0.3), inset 0 0 20px rgba(255,59,59,0.05)' : hasLoop ? `0 0 8px ${color}30` : 'none',
           }}
         >
           {isRecording ? (
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(255,59,59,0.8)' }} />
+          ) : hasLoop ? (
+            <>
+              {/* Waveform bars to indicate loop is loaded */}
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 2, height: 24 }}>
+                {[0.4,0.7,1,0.6,0.9,0.5,0.8,0.3,0.7,1,0.5,0.8].map((h, i) => (
+                  <div key={i} style={{ width: 3, borderRadius: 1, height: `${h * 100}%`, background: color, opacity: 0.7, boxShadow: `0 0 4px ${color}60` }} />
+                ))}
+              </div>
+              <span className="text-[8px] tracking-[0.12em]" style={{ color, fontFamily: "'Share Tech Mono', monospace", marginTop: 4 }}>LOOP LOADED</span>
+            </>
           ) : (
             <span className="text-[9px] tracking-[0.15em] font-bold" style={{ color: `${color}CC`, fontFamily: "'Share Tech Mono', monospace" }}>TAP TO RECORD</span>
           )}
-          <span className="text-[8px]" style={{ color: 'rgba(120,130,150,0.5)', fontFamily: "'Share Tech Mono', monospace" }}>Slot {num}</span>
+          <span className="text-[8px]" style={{ color: 'rgba(120,130,150,0.5)', fontFamily: "'Share Tech Mono', monospace", marginTop: hasLoop ? 2 : 0 }}>Slot {num}</span>
         </button>
       </div>
 

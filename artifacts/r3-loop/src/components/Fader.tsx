@@ -14,12 +14,16 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
   const timeRef = useRef(Math.random() * 100);
+  // Ref so the rAF loop can always read the latest value without restarting
+  const valueRef = useRef(value);
+  useEffect(() => { valueRef.current = value; }, [value]);
 
+  // rAF loop runs once on mount — reads valueRef so it never needs to restart
   useEffect(() => {
     const animate = () => {
       timeRef.current += 0.05;
       const t = timeRef.current;
-      const base = (Math.sin(t) * 0.35 + 0.65) * value;
+      const base = (Math.sin(t) * 0.35 + 0.65) * valueRef.current;
       const noise = () => (Math.random() - 0.5) * 0.15;
       const lvl = Math.max(0, Math.min(1, base + noise()));
       setMeterLevels(prev => prev.map((_, i) => {
@@ -30,7 +34,7 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
     };
     rafRef.current = requestAnimationFrame(animate);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [value]);
+  }, []); // stable — value is tracked through valueRef
 
   const getPositionFromEvent = (e: MouseEvent | React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -73,9 +77,9 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
           backgroundColor: 'rgba(8,10,15,0.9)'
         }} />
 
-        {/* Scale labels */}
+        {/* Scale labels — match the linear formula: v=1→+6, v=0.8→0, v=0.6→-6 … v=0→-∞ */}
         <div className="absolute left-1 top-0 bottom-0 flex flex-col justify-between py-2 z-10">
-          {['+6','0','-6','-12','-18','-24','-36','-60'].map(s => (
+          {['+6','0','-6','-12','-18','−∞'].map(s => (
             <span key={s} className="text-[7px] leading-none" style={{ color: 'rgba(140,150,170,0.5)', fontFamily: "'Share Tech Mono', monospace" }}>{s}</span>
           ))}
         </div>

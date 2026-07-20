@@ -86,7 +86,7 @@ export function SongView({ bpm = 120 }: SongViewProps) {
           </div>
         </div>
 
-        <span className="panel-header-meta">120 BPM · 4/4</span>
+        <span className="panel-header-meta">{bpm} BPM · 4/4</span>
       </div>
 
       {/* Main arrangement area */}

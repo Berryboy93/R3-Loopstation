@@ -8,6 +8,8 @@ const CHANNEL_NAMES = ['DRUMS','BASS','LEAD','PAD','SYNTH','FX SND','VOX','AUX']
 export function MixerView() {
   const [soloChannel, setSoloChannel] = useState<number|null>(null);
   const [mutedChannels, setMutedChannels] = useState<Set<number>>(new Set());
+  const [masterMuted, setMasterMuted] = useState(false);
+  const [masterSoloed, setMasterSoloed] = useState(false);
 
   // Pre-compute random initial fader values ONCE (not on every render)
   const initialFaderValues = useMemo(() =>
@@ -126,10 +128,34 @@ export function MixerView() {
           <div className="flex justify-center py-2" style={{ borderBottom: '1px solid #222', width: '100%' }}>
             <Knob size={24} color="#BF5FFF" initialValue={0.3} label="SEND" />
           </div>
-          {/* M/S for master — real buttons, not divs */}
+          {/* M/S for master — real interactive buttons with state */}
           <div className="flex w-full" style={{ height: 22, borderBottom: '1px solid #222', flexShrink: 0 }}>
-            <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333', background: 'transparent', border: 'none', borderRight: '1px solid #222', cursor: 'pointer' }}>M</button>
-            <button style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontFamily: "'Share Tech Mono',monospace", color: '#333', background: 'transparent', border: 'none', cursor: 'pointer' }}>S</button>
+            <button
+              onClick={() => setMasterMuted(m => !m)}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, fontFamily: "'Share Tech Mono',monospace",
+                background: masterMuted ? 'rgba(255,140,0,0.22)' : 'transparent',
+                color: masterMuted ? '#FF8C00' : '#444',
+                border: 'none', borderRight: '1px solid #222', cursor: 'pointer',
+                boxShadow: masterMuted ? 'inset 0 0 8px rgba(255,140,0,0.15), 0 0 6px rgba(255,140,0,0.3)' : 'none',
+                textShadow: masterMuted ? '0 0 8px #FF8C00' : 'none',
+                transition: 'all 0.15s',
+              }}
+            >M</button>
+            <button
+              onClick={() => setMasterSoloed(s => !s)}
+              style={{
+                flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 9, fontFamily: "'Share Tech Mono',monospace",
+                background: masterSoloed ? 'rgba(255,215,0,0.22)' : 'transparent',
+                color: masterSoloed ? '#FFD700' : '#444',
+                border: 'none', cursor: 'pointer',
+                boxShadow: masterSoloed ? 'inset 0 0 8px rgba(255,215,0,0.15), 0 0 6px rgba(255,215,0,0.3)' : 'none',
+                textShadow: masterSoloed ? '0 0 8px #FFD700' : 'none',
+                transition: 'all 0.15s',
+              }}
+            >S</button>
           </div>
           <div style={{ flex: 1, width: '100%', minHeight: 120 }}>
             <Fader color="#B7FF00" initialValue={0.85} />
