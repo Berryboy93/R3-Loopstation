@@ -56,7 +56,7 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
   };
 
   const ledColor = (i: number) => {
-    if (i < 3) return '#FF2222';
+    if (i < 3) return '#FF3B3B';
     if (i < 8) return '#FF8C00';
     if (i < 14) return '#FFD700';
     return color;

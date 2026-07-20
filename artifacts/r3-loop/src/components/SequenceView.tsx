@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 const INSTRUMENTS = [
   { name: 'KICK',  color: '#39FF14' },
@@ -11,35 +11,49 @@ const INSTRUMENTS = [
   { name: 'FX',    color: '#FF69B4' },
 ];
 
-const STEPS = 16;
+function makeDefaultPattern(steps: number): boolean[][] {
+  return INSTRUMENTS.map((_, row) =>
+    Array.from({ length: steps }, (_, col) => {
+      if (row === 0) return [0,4,8,12].includes(col);
+      if (row === 1) return [4,12].includes(col);
+      if (row === 2) return [2,6,10,14].includes(col);
+      return Math.random() > 0.8;
+    })
+  );
+}
 
 export function SequenceView() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [pattern, setPattern] = useState<boolean[][]>(() =>
-    INSTRUMENTS.map((_, row) =>
-      Array.from({ length: STEPS }, (_, col) => {
-        if (row === 0) return [0,4,8,12].includes(col);
-        if (row === 1) return [4,12].includes(col);
-        if (row === 2) return [2,6,10,14].includes(col);
-        return Math.random() > 0.75;
-      })
-    )
-  );
+  const [stepCount, setStepCount] = useState(16);
+  const [pattern, setPattern] = useState<boolean[][]>(() => makeDefaultPattern(16));
+  const [clipboard, setClipboard] = useState<boolean[][] | null>(null);
   const [activePattern, setActivePattern] = useState('A');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // When step count changes, extend or trim pattern
+  const changeStepCount = useCallback((n: number) => {
+    setStepCount(n);
+    setCurrentStep(0);
+    setIsPlaying(false);
+    setPattern(prev => prev.map(row =>
+      n > row.length
+        ? [...row, ...Array(n - row.length).fill(false)]
+        : row.slice(0, n)
+    ));
+  }, []);
 
   useEffect(() => {
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
-        setCurrentStep(s => (s + 1) % STEPS);
+        setCurrentStep(s => (s + 1) % stepCount);
       }, 125);
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setCurrentStep(0);
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [isPlaying]);
+  }, [isPlaying, stepCount]);
 
   const toggleStep = (row: number, col: number) => {
     setPattern(prev => prev.map((r, ri) =>
@@ -47,111 +61,142 @@ export function SequenceView() {
     ));
   };
 
+  const handleCopy = () => setClipboard(pattern.map(r => [...r]));
+  const handlePaste = () => { if (clipboard) setPattern(clipboard.map(r => [...r])); };
+  const handleClear = () => setPattern(prev => prev.map(r => r.map(() => false)));
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden select-none" style={{ background: '#0a0a0a' }}>
       {/* Header */}
-      <div className="h-8 flex items-center gap-4 px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
+      <div className="h-8 flex items-center gap-3 px-4 shrink-0" style={{ background: '#111', borderBottom: '1px solid #222' }}>
         <span style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.12em' }}>SEQUENCE</span>
+
         <button
           onClick={() => setIsPlaying(p => !p)}
           style={{
             fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
-            padding: '2px 10px', background: isPlaying ? '#B7FF00' : 'transparent',
+            padding: '2px 10px',
+            background: isPlaying ? '#B7FF00' : 'rgba(183,255,0,0.08)',
             color: isPlaying ? '#000' : '#888',
             border: `1px solid ${isPlaying ? '#B7FF00' : '#333'}`,
             boxShadow: isPlaying ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
             cursor: 'pointer', borderRadius: 2,
+            transition: 'all 0.15s',
           }}
         >{isPlaying ? '■ STOP' : '▶ PLAY'}</button>
-        <div className="flex items-center gap-2 ml-2">
-          {['16','32','64'].map(n => (
-            <button key={n} style={{
+
+        {/* Step count selector */}
+        <div className="flex items-center gap-1 ml-1">
+          <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#444', marginRight: 2 }}>STEPS</span>
+          {[16, 32].map(n => (
+            <button key={n} onClick={() => changeStepCount(n)} style={{
               fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
-              padding: '2px 6px', background: n === '16' ? 'rgba(183,255,0,0.1)' : 'transparent',
-              color: n === '16' ? '#B7FF00' : '#555',
-              border: `1px solid ${n === '16' ? 'rgba(183,255,0,0.4)' : '#222'}`,
-              cursor: 'pointer', borderRadius: 2,
+              padding: '2px 6px',
+              background: stepCount === n ? 'rgba(183,255,0,0.12)' : 'transparent',
+              color: stepCount === n ? '#B7FF00' : '#444',
+              border: `1px solid ${stepCount === n ? 'rgba(183,255,0,0.4)' : '#222'}`,
+              cursor: 'pointer', borderRadius: 2, transition: 'all 0.1s',
             }}>{n}</button>
           ))}
         </div>
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#555', marginLeft: 'auto' }}>1/16 GRID</span>
+
+        {/* Playhead indicator */}
+        {isPlaying && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 4 }}>
+            <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#B7FF00', boxShadow: '0 0 6px rgba(183,255,0,0.8)', animation: 'pulse 0.5s ease-in-out infinite alternate' }} />
+            <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#B7FF00' }}>STEP {currentStep + 1}/{stepCount}</span>
+          </div>
+        )}
+
+        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#444', marginLeft: 'auto' }}>1/16 · 120 BPM</span>
       </div>
 
       {/* Step grid */}
-      <div className="flex-1 flex flex-col overflow-hidden p-3 gap-1">
+      <div className="flex-1 flex flex-col overflow-hidden p-3 gap-[3px]">
         {/* Step numbers */}
-        <div className="flex" style={{ paddingLeft: 68 }}>
-          {Array.from({ length: STEPS }).map((_, col) => (
+        <div className="flex" style={{ paddingLeft: 66 }}>
+          {Array.from({ length: stepCount }).map((_, col) => (
             <div key={col} style={{
               flex: 1, textAlign: 'center',
-              fontFamily: "'Share Tech Mono',monospace", fontSize: 8,
-              color: currentStep === col && isPlaying ? '#B7FF00' : '#333',
-              marginRight: (col + 1) % 4 === 0 && col < STEPS - 1 ? 6 : 1,
-              textShadow: currentStep === col && isPlaying ? '0 0 6px #B7FF00' : 'none',
+              fontFamily: "'Share Tech Mono',monospace", fontSize: 7,
+              color: isPlaying && currentStep === col ? '#B7FF00' : col % 4 === 0 ? '#444' : '#252525',
+              marginRight: (col + 1) % 4 === 0 && col < stepCount - 1 ? 4 : 0,
+              textShadow: isPlaying && currentStep === col ? '0 0 6px #B7FF00' : 'none',
+              transition: 'color 0.05s',
             }}>{col + 1}</div>
           ))}
         </div>
 
         {INSTRUMENTS.map((inst, row) => (
-          <div key={row} className="flex items-center gap-1" style={{ flex: 1, minHeight: 0 }}>
+          <div key={row} className="flex items-center" style={{ flex: 1, minHeight: 0, gap: 0 }}>
             {/* Instrument label */}
             <div style={{
-              width: 60, flexShrink: 0, fontFamily: "'Share Tech Mono',monospace",
-              fontSize: 9, color: inst.color, textAlign: 'right', paddingRight: 8,
-              textShadow: `0 0 6px ${inst.color}60`,
+              width: 58, flexShrink: 0, fontFamily: "'Share Tech Mono',monospace",
+              fontSize: 8, color: inst.color, textAlign: 'right', paddingRight: 8,
+              textShadow: `0 0 5px ${inst.color}50`, letterSpacing: '0.05em',
             }}>{inst.name}</div>
 
             {/* Steps */}
-            {Array.from({ length: STEPS }).map((_, col) => {
-              const active = pattern[row][col];
-              const isCurrent = currentStep === col && isPlaying;
-              return (
-                <button
-                  key={col}
-                  onClick={() => toggleStep(row, col)}
-                  style={{
-                    flex: 1, minHeight: 28, borderRadius: 2, cursor: 'pointer',
-                    marginRight: (col + 1) % 4 === 0 && col < STEPS - 1 ? 5 : 0,
-                    background: active
-                      ? isCurrent ? inst.color : `${inst.color}CC`
-                      : isCurrent ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.03)',
-                    border: active
-                      ? `1px solid ${inst.color}`
-                      : '1px solid rgba(255,255,255,0.06)',
-                    boxShadow: active ? `0 0 6px ${inst.color}60` : isCurrent ? '0 0 4px rgba(183,255,0,0.2)' : 'none',
-                    transition: 'all 0.05s',
-                  }}
-                />
-              );
-            })}
+            <div className="flex flex-1" style={{ gap: 0 }}>
+              {Array.from({ length: stepCount }).map((_, col) => {
+                const active = pattern[row]?.[col] ?? false;
+                const isCurrent = isPlaying && currentStep === col;
+                const isGroupEnd = (col + 1) % 4 === 0 && col < stepCount - 1;
+                return (
+                  <button
+                    key={col}
+                    onClick={() => toggleStep(row, col)}
+                    style={{
+                      flex: 1, minHeight: 0, height: '100%',
+                      borderRadius: 2, cursor: 'pointer',
+                      marginRight: isGroupEnd ? 4 : 1,
+                      background: active
+                        ? isCurrent ? inst.color : `${inst.color}BB`
+                        : isCurrent ? 'rgba(255,255,255,0.1)' : col % 4 === 0 ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.02)',
+                      border: active
+                        ? `1px solid ${inst.color}`
+                        : `1px solid ${isCurrent ? 'rgba(183,255,0,0.3)' : 'rgba(255,255,255,0.05)'}`,
+                      boxShadow: active ? `0 0 5px ${inst.color}50` : 'none',
+                      transition: 'background 0.04s, box-shadow 0.04s',
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Pattern row */}
+      {/* Pattern bank + actions */}
       <div className="flex items-center gap-2 px-4 py-2 shrink-0" style={{ background: '#111', borderTop: '1px solid #222' }}>
-        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 9, color: '#555', marginRight: 4 }}>PATTERN</span>
+        <span style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 8, color: '#444', marginRight: 2 }}>PATTERN</span>
         {['A','B','C','D','E','F','G','H'].map(p => (
           <button
             key={p}
             onClick={() => setActivePattern(p)}
             style={{
-              width: 28, height: 22, borderRadius: 2, cursor: 'pointer',
-              fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
-              background: activePattern === p ? '#B7FF00' : 'rgba(255,255,255,0.04)',
-              color: activePattern === p ? '#000' : '#666',
-              border: `1px solid ${activePattern === p ? '#B7FF00' : '#333'}`,
-              boxShadow: activePattern === p ? '0 0 6px rgba(183,255,0,0.5)' : 'none',
+              width: 26, height: 20, borderRadius: 2, cursor: 'pointer',
+              fontFamily: "'Share Tech Mono',monospace", fontSize: 8,
+              background: activePattern === p ? '#B7FF00' : 'rgba(255,255,255,0.03)',
+              color: activePattern === p ? '#000' : '#555',
+              border: `1px solid ${activePattern === p ? '#B7FF00' : '#2a2a2a'}`,
+              boxShadow: activePattern === p ? '0 0 6px rgba(183,255,0,0.45)' : 'none',
+              transition: 'all 0.1s',
             }}
           >{p}</button>
         ))}
         <div className="flex gap-1 ml-auto">
-          {['COPY','PASTE','CLEAR'].map(a => (
-            <button key={a} style={{
-              fontFamily: "'Share Tech Mono',monospace", fontSize: 9,
+          {[
+            { label: 'COPY',  fn: handleCopy,  color: '#555' },
+            { label: 'PASTE', fn: handlePaste, color: clipboard ? '#B7FF00' : '#555' },
+            { label: 'CLEAR', fn: handleClear, color: '#FF3B3B' },
+          ].map(a => (
+            <button key={a.label} onClick={a.fn} style={{
+              fontFamily: "'Share Tech Mono',monospace", fontSize: 8,
               padding: '2px 8px', background: 'transparent',
-              color: '#555', border: '1px solid #333', cursor: 'pointer', borderRadius: 2,
-            }}>{a}</button>
+              color: a.color, border: `1px solid ${a.color === '#555' ? '#2a2a2a' : a.color + '50'}`,
+              cursor: 'pointer', borderRadius: 2, transition: 'all 0.1s',
+            }}>{a.label}</button>
           ))}
         </div>
       </div>

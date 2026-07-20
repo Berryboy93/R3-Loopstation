@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Fader } from './Fader';
 import { ParamRow } from './ParamRow';
 
@@ -13,6 +13,9 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
   const [muted, setMuted] = useState(false);
   const [soloed, setSoloed] = useState(false);
   const [quantized, setQuantized] = useState(false);
+  const [hasLoop, setHasLoop] = useState(false);
+  // Stable random initial value — computed once on mount, not on every render
+  const initialFaderValue = useRef(0.7 + Math.random() * 0.1);
 
   return (
     <div
@@ -65,7 +68,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           { key: 'M', active: muted, toggle: () => setMuted(m => !m), activeColor: '#FF8C00' },
           { key: 'S', active: soloed, toggle: () => setSoloed(s => !s), activeColor: '#FFD700' },
           { key: 'Q', active: quantized, toggle: () => setQuantized(q => !q), activeColor: color },
-          { key: 'CLR', active: false, toggle: () => {}, activeColor: '#FF3B3B' },
+          { key: 'CLR', active: false, toggle: () => { setIsRecording(false); setHasLoop(false); }, activeColor: '#FF3B3B' },
         ].map(({ key, active, toggle, activeColor }, i, arr) => (
           <button
             key={key}
@@ -85,9 +88,9 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
         ))}
       </div>
 
-      {/* Fader */}
+      {/* Fader — stable initial value via useRef, not recalculated on re-render */}
       <div className="flex-1 min-h-0" style={{ minHeight: 140 }}>
-        <Fader color={color} initialValue={0.7 + Math.random() * 0.1} />
+        <Fader color={color} initialValue={initialFaderValue.current} />
       </div>
 
       {/* Param rows */}

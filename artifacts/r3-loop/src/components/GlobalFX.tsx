@@ -89,7 +89,7 @@ export function GlobalFX() {
       <div className="p-3">
         <div className="text-[9px] text-[#888] font-bold mb-2" style={{ fontFamily: "'Share Tech Mono', monospace" }}>DELAY</div>
         <div className="flex justify-between">
-          <Knob label="TIME" size={28} color="#FF8C00" initialValue={0.3} />
+          <Knob label="T.DLY" size={28} color="#FF8C00" initialValue={0.3} />
           <Knob label="MIX" size={28} color="#FF8C00" initialValue={0.5} />
           <Knob label="FEED" size={28} color="#FF8C00" initialValue={0.6} />
         </div>

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useId } from 'react';
 
 interface KnobProps {
   label?: string;
@@ -64,8 +64,9 @@ export function Knob({ label, valueDisplay, size = 44, color = '#B7FF00', initia
 
   const indicator = arcPoint(arcR - 3, angle);
 
-  // Gradient id unique per instance
-  const gradId = `knob-grad-${label?.replace(/\s/g, '') ?? Math.random().toString(36).slice(2)}`;
+  // Stable unique gradient ID per mounted instance (useId avoids collision when same label appears multiple times)
+  const uid = useId();
+  const gradId = `knob-grad-${uid.replace(/:/g, '')}`;
 
   return (
     <div className={`flex flex-col items-center gap-[3px] select-none ${className}`}>

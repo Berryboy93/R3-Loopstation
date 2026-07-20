@@ -15,6 +15,8 @@ import { StatusBar } from './StatusBar';
 
 export function DAWLayout() {
   const [activeTab, setActiveTab] = useState('PERFORM');
+  // BPM lifted here so Header and StatusBar share the same source of truth
+  const [bpm, setBpm] = useState(120);
 
   const centerContent = () => {
     switch (activeTab) {
@@ -28,23 +30,23 @@ export function DAWLayout() {
 
   return (
     <div className="w-full h-full flex flex-col text-white overflow-hidden" style={{ background: '#080808' }}>
-      <Header />
+      <Header bpm={bpm} setBpm={setBpm} />
       <MarqueeTicker />
       <TabNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      
+
       <div className="flex-1 flex overflow-hidden min-h-0">
         <GlobalFX />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ background: '#0a0a0a' }}>
           {centerContent()}
         </div>
-        <div className="w-[200px] flex flex-col shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: '#111', borderLeft: '1px solid #222' }}>
+        <div className="w-[200px] flex flex-col shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: '#0f0f0f', borderLeft: '1px solid #1e1e1e' }}>
           <SceneBank />
           <MasterEQ />
           <OutputPanel />
         </div>
       </div>
-      
-      <StatusBar />
+
+      <StatusBar bpm={bpm} />
     </div>
   );
 }
