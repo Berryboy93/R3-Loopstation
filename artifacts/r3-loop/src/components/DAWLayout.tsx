@@ -22,7 +22,9 @@ export function DAWLayout() {
   // Loaded-loop counter — updated by LoopGrid when any slot's hasLoop state changes
   const [loopsLoaded, setLoopsLoaded] = useState(0);
   // Live health check — drives the AUDIO ONLINE / OFFLINE indicator in StatusBar
-  const apiOnline = useHealthCheck('/api-server/api/healthz');
+  // API server is routed at /api (see artifacts/api-server config) — polling
+  // any other path would hit the SPA fallback and report a false "online".
+  const apiOnline = useHealthCheck('/api/healthz');
 
   const centerContent = () => {
     switch (activeTab) {
