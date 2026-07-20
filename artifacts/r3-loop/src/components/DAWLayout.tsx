@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useHealthCheck } from '../hooks/useHealthCheck';
 import { Header } from './Header';
 import { MarqueeTicker } from './MarqueeTicker';
 import { TabNav } from './TabNav';
@@ -18,6 +19,10 @@ export function DAWLayout() {
   const [activeTab, setActiveTab] = useState('PERFORM');
   // BPM lifted here so Header and StatusBar share the same source of truth
   const [bpm, setBpm] = useState(120);
+  // Loaded-loop counter — updated by LoopGrid when any slot's hasLoop state changes
+  const [loopsLoaded, setLoopsLoaded] = useState(0);
+  // Live health check — drives the AUDIO ONLINE / OFFLINE indicator in StatusBar
+  const apiOnline = useHealthCheck('/api-server/api/healthz');
 
   const centerContent = () => {
     switch (activeTab) {
@@ -26,7 +31,7 @@ export function DAWLayout() {
       case 'FX RACK':  return <FxRackView />;
       case 'SONG':     return <SongView bpm={bpm} />;
       case 'VOCAL':    return <VocalView />;
-      default:         return <LoopGrid />;
+      default:         return <LoopGrid onLoopCountChange={setLoopsLoaded} />;
     }
   };
 
@@ -48,7 +53,7 @@ export function DAWLayout() {
         </div>
       </div>
 
-      <StatusBar bpm={bpm} />
+      <StatusBar bpm={bpm} apiOnline={apiOnline ?? false} loopsLoaded={loopsLoaded} />
     </div>
   );
 }

@@ -6,9 +6,11 @@ interface LoopSlotProps {
   num: number;
   color: string;
   glowClass: string;
+  /** Called whenever the loaded-loop state changes so parents can count loaded slots */
+  onHasLoopChange?: (hasLoop: boolean) => void;
 }
 
-export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
+export function LoopSlot({ num, color, glowClass, onHasLoopChange }: LoopSlotProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [muted,       setMuted]       = useState(false);
   const [soloed,      setSoloed]      = useState(false);
@@ -73,7 +75,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
                 <button
                   key={item.label}
                   onClick={() => {
-                    if (item.label === 'CLEAR') { setIsRecording(false); setHasLoop(false); }
+                    if (item.label === 'CLEAR') { setIsRecording(false); setHasLoop(false); onHasLoopChange?.(false); }
                     setShowMenu(false);
                   }}
                   style={{
@@ -98,7 +100,10 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
       {/* Record zone */}
       <div className="px-2 py-1.5 shrink-0" style={{ borderBottom: `1px solid ${color}20` }}>
         <button
-          onClick={() => { if (isRecording) setHasLoop(true); setIsRecording(r => !r); }}
+          onClick={() => {
+            if (isRecording) { setHasLoop(true); onHasLoopChange?.(true); }
+            setIsRecording(r => !r);
+          }}
           className="w-full flex flex-col items-center justify-center gap-0.5 rounded-sm transition-all"
           style={{
             height: 80,
@@ -135,7 +140,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           { key: 'M', active: muted, toggle: () => setMuted(m => !m), activeColor: '#FF8C00' },
           { key: 'S', active: soloed, toggle: () => setSoloed(s => !s), activeColor: '#FFD700' },
           { key: 'Q', active: quantized, toggle: () => setQuantized(q => !q), activeColor: color },
-          { key: 'CLR', active: false, toggle: () => { setIsRecording(false); setHasLoop(false); }, activeColor: '#FF3B3B' },
+          { key: 'CLR', active: false, toggle: () => { setIsRecording(false); setHasLoop(false); onHasLoopChange?.(false); }, activeColor: '#FF3B3B' },
         ].map(({ key, active, toggle, activeColor }, i, arr) => (
           <button
             key={key}

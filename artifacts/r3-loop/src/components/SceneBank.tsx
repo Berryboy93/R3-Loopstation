@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
 export function SceneBank() {
-  const [activeScene, setActiveScene] = useState('A');
+  const [activeScene,  setActiveScene]  = useState('A');
+  // savedScenes tracks which slots have been explicitly saved by the user
+  const [savedScenes,  setSavedScenes]  = useState<Set<string>>(new Set());
+  const [recallFlash,  setRecallFlash]  = useState(false);
   
   const scenes = [
     'A', 'B', 'C', 'D',
@@ -42,6 +45,11 @@ export function SceneBank() {
                   style={{ background: '#B7FF00', boxShadow: '0 1px 6px rgba(183,255,0,0.7)' }}
                 />
               )}
+              {/* Saved indicator dot — bottom-centre, only visible when not active */}
+              {savedScenes.has(scene) && !active && (
+                <div className="absolute bottom-[3px] left-1/2 -translate-x-1/2 w-[3px] h-[3px] rounded-full"
+                  style={{ background: '#B7FF00', opacity: 0.55 }} />
+              )}
               {scene}
             </button>
           );
@@ -49,12 +57,29 @@ export function SceneBank() {
       </div>
 
       <div className="flex gap-1">
-        <button className="flex-1 glass-panel text-[#888] text-[9px] py-1.5 rounded-sm hover:bg-[rgba(255,255,255,0.05)] hover:text-white transition-colors" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
-          RECALL
-        </button>
-        <button className="flex-1 glass-panel text-[#888] text-[9px] py-1.5 rounded-sm hover:bg-[rgba(255,255,255,0.05)] hover:text-white transition-colors" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
-          SAVE
-        </button>
+        <button
+          onClick={() => {
+            if (!savedScenes.has(activeScene)) return;
+            setRecallFlash(true);
+            setTimeout(() => setRecallFlash(false), 500);
+          }}
+          className="flex-1 glass-panel text-[9px] py-1.5 rounded-sm transition-all"
+          style={{
+            fontFamily: "'Share Tech Mono', monospace",
+            color: recallFlash ? '#B7FF00'
+                 : savedScenes.has(activeScene) ? '#888'
+                 : '#2a2a2a',
+            cursor: savedScenes.has(activeScene) ? 'pointer' : 'default',
+            textShadow: recallFlash ? '0 0 8px rgba(183,255,0,0.7)' : 'none',
+          }}
+        >RECALL</button>
+        <button
+          onClick={() => setSavedScenes(prev => new Set([...prev, activeScene]))}
+          className="flex-1 glass-panel text-[9px] py-1.5 rounded-sm transition-colors"
+          style={{ fontFamily: "'Share Tech Mono', monospace", color: savedScenes.has(activeScene) ? '#B7FF00' : '#888' }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#B7FF00'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = savedScenes.has(activeScene) ? '#B7FF00' : '#888'; }}
+        >SAVE</button>
       </div>
     </div>
   );

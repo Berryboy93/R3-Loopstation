@@ -14,9 +14,10 @@ export function Header({ bpm, setBpm }: HeaderProps) {
   const [meteo, setMeteo]           = useState(false);
   const [grain, setGrain]           = useState(false);
   // Top-right action buttons — wired to local state so they react visually
-  const [isDark,    setIsDark]    = useState(true);
-  const [isSikk,    setIsSikk]    = useState(false);
-  const [isLinked,  setIsLinked]  = useState(false);
+  const [isDark,       setIsDark]       = useState(true);
+  const [isSikk,       setIsSikk]       = useState(false);
+  const [isLinked,     setIsLinked]     = useState(false);
+  const [signOutFlash, setSignOutFlash] = useState(false);
 
   // VU meter — animated via rAF, NOT Math.random() in render
   const [vuLevels, setVuLevels]     = useState<number[]>(Array(8).fill(0));
@@ -282,9 +283,15 @@ export function Header({ bpm, setBpm }: HeaderProps) {
               }}
             >⟳ SIKK</button>
           </div>
-          <button style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: 8, color: '#444', background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'right' }}>
-            SIGN OUT
-          </button>
+          <button
+            onClick={() => { setSignOutFlash(true); setTimeout(() => setSignOutFlash(false), 1000); }}
+            style={{
+              fontFamily: "'Share Tech Mono', monospace", fontSize: 8, background: 'transparent',
+              border: 'none', cursor: 'pointer', textAlign: 'right', transition: 'color 0.12s',
+              color: signOutFlash ? '#B7FF00' : '#444',
+              textShadow: signOutFlash ? '0 0 8px rgba(183,255,0,0.5)' : 'none',
+            }}
+          >{signOutFlash ? '✓ SIGNED OUT' : 'SIGN OUT'}</button>
         </div>
 
         {/* R3 avatar circle */}
