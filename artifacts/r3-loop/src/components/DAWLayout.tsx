@@ -1,32 +1,43 @@
+import { useState } from 'react';
 import { Header } from './Header';
 import { MarqueeTicker } from './MarqueeTicker';
 import { TabNav } from './TabNav';
 import { GlobalFX } from './GlobalFX';
 import { LoopGrid } from './LoopGrid';
+import { MixerView } from './MixerView';
+import { SequenceView } from './SequenceView';
+import { FxRackView } from './FxRackView';
+import { SongView } from './SongView';
 import { SceneBank } from './SceneBank';
 import { MasterEQ } from './MasterEQ';
 import { OutputPanel } from './OutputPanel';
 import { StatusBar } from './StatusBar';
 
 export function DAWLayout() {
+  const [activeTab, setActiveTab] = useState('PERFORM');
+
+  const centerContent = () => {
+    switch (activeTab) {
+      case 'MIXER':    return <MixerView />;
+      case 'SEQUENCE': return <SequenceView />;
+      case 'FX RACK':  return <FxRackView />;
+      case 'SONG':     return <SongView />;
+      default:         return <LoopGrid />;
+    }
+  };
+
   return (
-    <div className="w-full h-full flex flex-col text-white overflow-hidden" style={{ 
-      background: 'radial-gradient(ellipse at 50% 0%, rgba(183,255,0,0.04) 0%, rgba(0,15,30,0.0) 60%), #060910'
-    }}>
+    <div className="w-full h-full flex flex-col text-white overflow-hidden" style={{ background: '#080808' }}>
       <Header />
       <MarqueeTicker />
-      <TabNav />
+      <TabNav activeTab={activeTab} setActiveTab={setActiveTab} />
       
       <div className="flex-1 flex overflow-hidden min-h-0">
         <GlobalFX />
-        
-        {/* Main Loop Area */}
-        <div className="flex-1 flex flex-col min-w-0" style={{ background: 'rgba(5, 8, 14, 0.4)' }}>
-          <LoopGrid />
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden" style={{ background: '#0a0a0a' }}>
+          {centerContent()}
         </div>
-        
-        {/* Right Panel */}
-        <div className="w-[200px] flex flex-col glass-panel shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden laser-white" style={{ borderTop: 'none', borderBottom: 'none', borderRight: 'none' }}>
+        <div className="w-[200px] flex flex-col shrink-0 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ background: '#111', borderLeft: '1px solid #222' }}>
           <SceneBank />
           <MasterEQ />
           <OutputPanel />

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+interface TabNavProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
 
-export function TabNav() {
-  const [activeTab, setActiveTab] = useState('PERFORM');
+export function TabNav({ activeTab, setActiveTab }: TabNavProps) {
   const tabs = ['PERFORM', 'MIXER', 'SEQUENCE', 'FX RACK', 'SONG'];
 
   return (

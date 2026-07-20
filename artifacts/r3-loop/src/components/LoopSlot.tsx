@@ -44,7 +44,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           onClick={() => setIsRecording(!isRecording)}
           className="w-full flex flex-col items-center justify-center gap-0.5 rounded-sm transition-all"
           style={{
-            height: 60,
+            height: 80,
             border: isRecording ? `1px solid #FF3B3B` : `1px dashed ${color}25`,
             background: isRecording ? 'rgba(255,59,59,0.08)' : `${color}04`,
             boxShadow: isRecording ? '0 0 12px rgba(255,59,59,0.3), inset 0 0 20px rgba(255,59,59,0.05)' : 'none',
@@ -53,7 +53,7 @@ export function LoopSlot({ num, color, glowClass }: LoopSlotProps) {
           {isRecording ? (
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" style={{ boxShadow: '0 0 8px rgba(255,59,59,0.8)' }} />
           ) : (
-            <span className="text-[9px] tracking-[0.15em]" style={{ color: `${color}60`, fontFamily: "'Share Tech Mono', monospace" }}>TAP TO RECORD</span>
+            <span className="text-[9px] tracking-[0.15em] font-bold" style={{ color: `${color}CC`, fontFamily: "'Share Tech Mono', monospace" }}>TAP TO RECORD</span>
           )}
           <span className="text-[8px]" style={{ color: 'rgba(120,130,150,0.5)', fontFamily: "'Share Tech Mono', monospace" }}>Slot {num}</span>
         </button>

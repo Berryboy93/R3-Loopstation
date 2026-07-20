@@ -7,17 +7,19 @@ export function StatusBar() {
         <span className="text-[#B7FF00] font-bold" style={{ fontFamily: "'Share Tech Mono', monospace" }}>AUDIO ONLINE</span>
       </div>
 
-      <div className="flex items-center gap-6 text-[#777]" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
+      <div className="flex items-center gap-4 text-[#777]" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
         <span>0 / 8 LOOPS LOADED</span>
         <span className="text-[#444]">|</span>
         <span>128 SPM</span>
         <span className="text-[#444]">|</span>
         <span>EXT: DLY</span>
-        <button className="glass-panel laser-white px-2 py-[2px] rounded hover:text-white transition-colors" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
+        <span className="text-[#444]">|</span>
+        <button className="glass-panel border border-[rgba(255,255,255,0.2)] px-2 py-[2px] rounded-sm hover:text-white hover:border-[rgba(255,255,255,0.4)] transition-colors" style={{ fontFamily: "'Share Tech Mono', monospace" }}>
           MIDI IN
         </button>
+        <span className="text-[#444]">|</span>
         <div className="flex items-center gap-1.5">
-          <div className="w-1 h-1 rounded-full bg-[#39FF14] shadow-[0_0_5px_rgba(57,255,20,0.8)]"></div>
+          <div className="w-1.5 h-1.5 rounded-full bg-[#39FF14] shadow-[0_0_5px_rgba(57,255,20,0.8)]"></div>
           <span>CLK OUT</span>
         </div>
         <span className="text-[#444]">|</span>

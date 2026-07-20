@@ -1,11 +1,28 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Knob } from './Knob';
 
 export function GlobalFX() {
   const [filterType, setFilterType] = useState('HPF');
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      el.scrollTop += e.deltaY;
+    };
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, []);
 
   return (
-    <div className="w-[160px] glass-panel laser-green flex flex-col shrink-0 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:hidden pb-4 select-none" style={{ borderTop: 'none', borderBottom: 'none' }}>
+    <div ref={scrollRef} className="w-[160px] glass-panel laser-green flex flex-col shrink-0 overflow-y-auto overflow-x-hidden pb-4 select-none" style={{ borderTop: 'none', borderBottom: 'none', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <style>{`
+        .w-\\[160px\\]::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
       <div className="h-8 flex items-center justify-between px-3 sticky top-0 z-10 glass-panel" style={{ border: 'none', borderBottom: '1px solid rgba(183,255,0,0.3)', boxShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
         <span className="text-[10px] font-bold text-white tracking-widest" style={{ fontFamily: "'Rajdhani', sans-serif" }}>GLOBAL FX</span>
         <div className="w-2 h-2 rounded-full bg-[#B7FF00] shadow-[0_0_5px_rgba(183,255,0,0.5)]"></div>

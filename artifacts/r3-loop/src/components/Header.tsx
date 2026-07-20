@@ -74,6 +74,11 @@ export function Header() {
               <div className="w-1.5 h-1.5 rounded-full bg-[#FF8C00] shadow-[0_0_5px_rgba(255,140,0,0.8)]"></div>
               <span className="text-[9px] text-[#FF8C00]" style={{ fontFamily: "'Share Tech Mono', monospace" }}>SWING</span>
             </div>
+            
+            <div className="border border-[#222] bg-[#0c0c0c] text-white px-1.5 py-0.5 rounded-sm flex items-center justify-center shadow-[inset_0_1px_2px_rgba(0,0,0,0.8)]" style={{ fontFamily: "'Share Tech Mono', monospace", fontSize: '9px' }}>
+              4/4
+            </div>
+
             <div className="flex items-center gap-1">
               <div className={`w-1.5 h-1.5 rounded-full ${quantize ? 'bg-[#B7FF00] shadow-[0_0_5px_rgba(183,255,0,0.8)]' : 'bg-[#333]'}`}></div>
               <span className="text-[9px] text-[#888]" style={{ fontFamily: "'Share Tech Mono', monospace" }}>QUANTIZE</span>
