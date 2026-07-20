@@ -9,13 +9,18 @@ interface FaderProps {
 }
 
 export function Fader({ color, initialValue = 0.75, label, className = '' }: FaderProps) {
-  const [value,      setValue]      = useState(initialValue);
-  const [meterLevels, setMeterLevels] = useState<number[]>(Array(40).fill(0));
+  const [value, setValue] = useState(initialValue);
 
   const isDragging   = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const rafRef       = useRef<number>(0);
   const timeRef      = useRef(Math.random() * 100);
+
+  // LED meter is animated by mutating DOM styles directly (no setState) —
+  // re-rendering the whole fader tree 60×/s for a decorative meter was the
+  // single biggest render cost with 16+ faders mounted.
+  const ledRefs    = useRef<(HTMLDivElement | null)[]>([]);
+  const ledLevels  = useRef<number[]>(Array(40).fill(0));
 
   // Ref so the rAF loop always reads the latest value without restarting.
   const valueRef = useRef(value);
@@ -26,23 +31,46 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
   const viewActive = useViewActive();
 
   // rAF loop — paused while the view is hidden, resumes on re-activation.
+  // Also depends on `color` so a runtime color change (e.g. channel mute
+  // swapping to gray) repaints lit LEDs instead of keeping the stale hue.
   useEffect(() => {
     if (!viewActive) return;
+    // Repaint currently-lit LEDs with the (possibly new) color.
+    for (let i = 0; i < 40; i++) {
+      const el = ledRefs.current[i];
+      if (el && ledLevels.current[i] > 0.5) {
+        const lc = ledColor(i);
+        el.style.background = lc;
+        el.style.boxShadow  = `0 0 4px ${lc}80`;
+      }
+    }
     const animate = () => {
       timeRef.current += 0.05;
       const t    = timeRef.current;
       const base = (Math.sin(t) * 0.35 + 0.65) * valueRef.current;
       const noise = () => (Math.random() - 0.5) * 0.15;
       const lvl  = Math.max(0, Math.min(1, base + noise()));
-      setMeterLevels(prev => prev.map((_, i) => {
+      const levels = ledLevels.current;
+      for (let i = 0; i < 40; i++) {
         const ledPos = 1 - i / 40;
-        return ledPos <= lvl ? 1 : Math.max(0, prev[i] - 0.08);
-      }));
+        const next   = ledPos <= lvl ? 1 : Math.max(0, levels[i] - 0.08);
+        const wasOn  = levels[i] > 0.5;
+        const isOn   = next > 0.5;
+        levels[i] = next;
+        if (wasOn !== isOn) {
+          const el = ledRefs.current[i];
+          if (el) {
+            const lc = ledColor(i);
+            el.style.background = isOn ? lc : 'rgba(255,255,255,0.04)';
+            el.style.boxShadow  = isOn ? `0 0 4px ${lc}80` : 'none';
+          }
+        }
+      }
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
-  }, [viewActive]);
+  }, [viewActive, color]);
 
   // ─── Mouse drag + unmount cleanup ─────────────────────────────────────────
   // Store active listeners in a ref so they can be removed if the component
@@ -124,27 +152,42 @@ export function Fader({ color, initialValue = 0.75, label, className = '' }: Fad
         {/* Meter + fader area */}
         <div
           ref={containerRef}
-          className="absolute inset-x-0 inset-y-0 flex justify-center items-stretch cursor-ns-resize"
+          className="absolute inset-x-0 inset-y-0 flex justify-center items-stretch cursor-ns-resize focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(183,255,0,0.5)]"
           onMouseDown={handleMouseDown}
+          role="slider"
+          tabIndex={0}
+          aria-label={label ? `${label} fader` : 'Channel fader'}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(value * 100)}
+          aria-valuetext={`${toDb(value)} dB`}
+          onKeyDown={e => {
+            const step = e.shiftKey ? 0.1 : 0.02;
+            let next: number | null = null;
+            if (e.key === 'ArrowUp')        next = Math.min(1, value + step);
+            else if (e.key === 'ArrowDown') next = Math.max(0, value - step);
+            else if (e.key === 'PageUp')    next = Math.min(1, value + 0.1);
+            else if (e.key === 'PageDown')  next = Math.max(0, value - 0.1);
+            else if (e.key === 'Home')      next = 0; // ARIA slider: Home = min
+            else if (e.key === 'End')       next = 1; // ARIA slider: End = max
+            if (next !== null) { e.preventDefault(); setValue(next); }
+          }}
           style={{ paddingLeft: 20, paddingRight: 12, paddingTop: 6, paddingBottom: 6 }}
         >
-          {/* LED meter column */}
-          <div className="flex flex-col gap-[1.5px] w-5 h-full justify-end">
-            {Array.from({ length: 40 }).map((_, i) => {
-              const active = meterLevels[i] > 0.5;
-              const lc     = ledColor(i);
-              return (
-                <div
-                  key={i}
-                  className="w-full rounded-[1px] flex-1"
-                  style={{
-                    background:  active ? lc : 'rgba(255,255,255,0.04)',
-                    boxShadow:   active ? `0 0 4px ${lc}80` : 'none',
-                    transition: 'background 40ms, box-shadow 40ms',
-                  }}
-                />
-              );
-            })}
+          {/* LED meter column — rendered once; the rAF loop mutates each
+              LED's style directly via ledRefs (no React re-render per frame) */}
+          <div className="flex flex-col gap-[1.5px] w-5 h-full justify-end" aria-hidden="true">
+            {Array.from({ length: 40 }).map((_, i) => (
+              <div
+                key={i}
+                ref={el => { ledRefs.current[i] = el; }}
+                className="w-full rounded-[1px] flex-1"
+                style={{
+                  background:  'rgba(255,255,255,0.04)',
+                  transition: 'background 40ms, box-shadow 40ms',
+                }}
+              />
+            ))}
           </div>
 
           {/* Fader slot + handle */}

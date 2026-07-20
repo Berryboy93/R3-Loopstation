@@ -201,7 +201,24 @@ export function Knob({
   return (
     <div className={`flex flex-col items-center gap-[3px] select-none ${className}`}>
       <div
-        className="relative cursor-ns-resize"
+        className="relative cursor-ns-resize focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(183,255,0,0.5)] rounded-full"
+        role="slider"
+        tabIndex={0}
+        aria-label={label ?? 'Knob'}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(value * 100)}
+        onKeyDown={e => {
+          const step = e.shiftKey ? 0.1 : 0.02;
+          let next: number | null = null;
+          if (e.key === 'ArrowUp' || e.key === 'ArrowRight')        next = Math.min(1, value + step);
+          else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft')  next = Math.max(0, value - step);
+          else if (e.key === 'PageUp')   next = Math.min(1, value + 0.1);
+          else if (e.key === 'PageDown') next = Math.max(0, value - 0.1);
+          else if (e.key === 'Home')     next = 0;
+          else if (e.key === 'End')      next = 1;
+          if (next !== null) { e.preventDefault(); setValue(next); onChange?.(next); }
+        }}
         style={{
           width: size, height: size,
           filter: active

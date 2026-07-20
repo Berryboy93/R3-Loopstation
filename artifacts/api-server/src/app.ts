@@ -25,7 +25,18 @@ app.use(
     },
   }),
 );
-app.use(cors());
+// In development, allow any origin (proxied preview iframe). In production,
+// same-origin requests need no CORS at all — only allow explicitly listed
+// origins via ALLOWED_ORIGINS (comma-separated), if any.
+const allowedOrigins =
+  process.env["ALLOWED_ORIGINS"]?.split(",").map((o) => o.trim()).filter(Boolean) ?? [];
+app.use(
+  cors(
+    process.env["NODE_ENV"] === "production"
+      ? { origin: allowedOrigins.length > 0 ? allowedOrigins : false }
+      : {},
+  ),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

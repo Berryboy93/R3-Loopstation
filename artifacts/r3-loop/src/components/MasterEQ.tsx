@@ -12,21 +12,37 @@ export function MasterEQ() {
   const rafRef = useRef<number>(0);
   const timeRef = useRef(Math.random() * 100);
 
+  // Meters animate by mutating LED DOM styles directly — no setState per frame.
+  const ledRefs = useRef<(HTMLDivElement | null)[][]>([[], []]);
+  const ledOn   = useRef<boolean[][]>([Array(14).fill(false), Array(14).fill(false)]);
+
   useEffect(() => {
+    const paint = (strip: number, value: number) => {
+      for (let j = 0; j < 14; j++) {
+        const isOn = (1 - j / 14) <= value;
+        if (isOn === ledOn.current[strip][j]) continue;
+        ledOn.current[strip][j] = isOn;
+        const el = ledRefs.current[strip][j];
+        if (!el) continue;
+        const color = j < 2 ? '#FF3B3B' : j < 4 ? '#FF8C00' : '#39FF14';
+        el.style.background = isOn ? color : 'rgba(255,255,255,0.04)';
+        el.style.boxShadow  = isOn ? `0 0 3px ${color}70` : 'none';
+      }
+    };
     const animate = () => {
       timeRef.current += 0.07;
       const t = timeRef.current;
       const base = Math.sin(t * 0.6) * 0.4 + 0.55;
-      setLMeter(Math.max(0, Math.min(1, base + (Math.random() - 0.5) * 0.18)));
-      setRMeter(Math.max(0, Math.min(1, base + (Math.random() - 0.5) * 0.18)));
+      paint(0, Math.max(0, Math.min(1, base + (Math.random() - 0.5) * 0.18)));
+      paint(1, Math.max(0, Math.min(1, base + (Math.random() - 0.5) * 0.18)));
       rafRef.current = requestAnimationFrame(animate);
     };
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
-  const renderMeter = (value: number) => (
-    <div style={{
+  const renderMeter = (strip: number) => (
+    <div aria-hidden="true" style={{
       width: 8, height: '100%',
       background: '#0a0a0a',
       border: '1px solid rgba(255,255,255,0.05)',
@@ -34,19 +50,15 @@ export function MasterEQ() {
       display: 'flex', flexDirection: 'column', gap: 1, padding: 1,
       boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.8)',
     }}>
-      {Array.from({ length: 14 }).map((_, j) => {
-        const ledPos = 1 - j / 14;
-        const active = ledPos <= value;
-        const color = j < 2 ? '#FF3B3B' : j < 4 ? '#FF8C00' : '#39FF14';
-        return (
-          <div key={j} style={{
+      {Array.from({ length: 14 }).map((_, j) => (
+        <div key={j}
+          ref={el => { ledRefs.current[strip][j] = el; }}
+          style={{
             flex: 1, borderRadius: 1,
-            background: active ? color : 'rgba(255,255,255,0.04)',
-            boxShadow: active ? `0 0 3px ${color}70` : 'none',
+            background: 'rgba(255,255,255,0.04)',
             transition: 'background 30ms',
           }} />
-        );
-      })}
+      ))}
     </div>
   );
 
@@ -56,8 +68,8 @@ export function MasterEQ() {
         <span className="panel-header-title">MASTER EQ</span>
         {/* L/R stereo meters */}
         <div style={{ display: 'flex', gap: 2, height: 40 }}>
-          {renderMeter(lMeter)}
-          {renderMeter(rMeter)}
+          {renderMeter(0)}
+          {renderMeter(1)}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', paddingLeft: 3 }}>
             {['+6','0','-12','-∞'].map(l => (
               <span key={l} style={{ fontFamily: "'Share Tech Mono',monospace", fontSize: 6, color: '#333', lineHeight: 1 }}>{l}</span>

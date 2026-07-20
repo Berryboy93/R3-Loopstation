@@ -63,8 +63,25 @@ export function ParamRow({ label, valueDisplay, color = '#cccccc', initialValue 
 
       <div
         ref={trackRef}
-        className="flex-1 h-[12px] flex items-center relative cursor-ew-resize group"
+        className="flex-1 h-[12px] flex items-center relative cursor-ew-resize group focus:outline-none focus-visible:ring-1 focus-visible:ring-[rgba(183,255,0,0.5)] rounded-full"
         onMouseDown={onDown}
+        role="slider"
+        tabIndex={0}
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={Math.round(value * 100)}
+        onKeyDown={e => {
+          const step = e.shiftKey ? 0.1 : 0.02;
+          let next: number | null = null;
+          if (e.key === 'ArrowRight' || e.key === 'ArrowUp')       next = Math.min(1, value + step);
+          else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(0, value - step);
+          else if (e.key === 'PageUp')   next = Math.min(1, value + 0.1);
+          else if (e.key === 'PageDown') next = Math.max(0, value - 0.1);
+          else if (e.key === 'Home')     next = 0;
+          else if (e.key === 'End')      next = 1;
+          if (next !== null) { e.preventDefault(); setValue(next); }
+        }}
       >
         {/* Track groove */}
         <div
